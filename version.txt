@@ -1,0 +1,4 @@
+This file is a dummy file which is changed only when a class is created or removed, to prevent cmake running every time
+and forcing a full project rebuild.
+
+1

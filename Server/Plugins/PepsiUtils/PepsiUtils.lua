@@ -66,7 +66,7 @@ function LoadLuaFiles()
         "/Hooks.lua"
     }
 
-    for file in files do
+    for _, file in pairs(files) do
         dofile(PLUGIN:GetLocalFolder() .. file)
     end
 end
