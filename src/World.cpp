@@ -1049,7 +1049,8 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 		UpdateSkyDarkness();
 
 		// Broadcast time update every 40 ticks (2 seconds)
-		if (m_LastTimeUpdate < m_WorldAge - cTickTime(40))
+		// actually every 20 ticks to keep with vanilla behavior
+		if (m_LastTimeUpdate < m_WorldAge - cTickTime(20))
 		{
 			BroadcastTimeUpdate();
 			m_LastTimeUpdate = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge);

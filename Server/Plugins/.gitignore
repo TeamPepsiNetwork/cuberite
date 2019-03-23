@@ -1,5 +1,6 @@
 *.txt
 *.md
+*.sqlite3
 
 AnarchySkyBlock/Config.ini
 PepsiUtils/Config.ini

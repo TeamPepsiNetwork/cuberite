@@ -16,6 +16,10 @@ SPAWN_RADIUS = -1
 
 WORLD = nil
 NETHER = nil
+DB = nil
+SUBMIT = nil
+
+PLAYER_DATA = {}
 
 function Initialize(Plugin)
     LOG("Loading " .. NAME .. " " .. VERSION .. " (version id " .. VERSION_NUMBER .. ")")
@@ -44,12 +48,20 @@ function Initialize(Plugin)
     end
     WORLD:SetLinkedNetherWorldName(NETHER_NAME)
     NETHER:SetLinkedOverworldName(WORLD_NAME)
+    WORLD:SetSpawn(0, 0, 0)
+    NETHER:SetSpawn(0, 0, 0)
 
-    -- TODO load spawn chunks
+    DB = sqlite3.open(LOCAL_FOLDER .. "/database.sqlite3")
+    DB:exec("CREATE TABLE skyblock (uuid TEXT PRIMARY KEY, started INTEGER)")
+    SUBMIT = DB:prepare[[ INSERT INTO skyblock VALUES (:uuid, :started) ]]
+
+    LoadSpawnChunks()
 
     -- Register hooks
     cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATING, OnChunkGenerating)
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_SPAWNED, OnPlayerSpawn)
+    cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED, OnPlayerJoined)
+    cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_DESTROYED, OnPlayerDestroyed)
 
     -- Command Bindings
 
@@ -61,6 +73,7 @@ end
 
 function OnDisable()
     LOG("Unloading " .. NAME .. " " .. VERSION .. "...")
+    DB:close()
 end
 
 function LoadConfiguration()
@@ -92,7 +105,7 @@ function LoadConfiguration()
         configIni:SetValueI("General", "Spawn_radius", 1)
     end
 
-    SPAWN_RADIUS = (SPAWN_RADIUS << 4) - 2
+    SPAWN_RADIUS = (SPAWN_RADIUS * 16) - 8
 
     -- save config again
     configIni:WriteFile(CONFIG_FILE)
@@ -103,7 +116,23 @@ function LoadLuaFiles()
         "/Hooks.lua"
     }
 
-    for file in files do
+    for _, file in pairs(files) do
         dofile(PLUGIN:GetLocalFolder() .. file)
     end
+end
+
+function LoadSpawnChunks()
+    local min = math.floor((-SPAWN_RADIUS) / 16)
+    local max = math.ceil(SPAWN_RADIUS / 16)
+    local chunks = {}
+    for x = min, max do
+        for z = min, max do
+            table.insert(chunks, { x, z })
+        end
+    end
+
+    WORLD:ChunkStay(chunks, nil, function()
+    end)
+
+    return true
 end

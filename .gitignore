@@ -121,3 +121,5 @@ tidy-build
 run-clang-tidy.py
 
 cmake-build-debug/
+cmake-build-release/
+/build/
