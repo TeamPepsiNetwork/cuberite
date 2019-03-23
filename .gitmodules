@@ -63,3 +63,12 @@
 	path = lib/fmt
 	url = https://github.com/fmtlib/fmt.git
 	ignore = dirty
+[submodule "Server/Plugins/WorldEdit"]
+	path = Server/Plugins/WorldEdit
+	url = https://github.com/TeamPepsiNetwork/WorldEdit.git
+[submodule "Server/Plugins/SkyBlock"]
+	path = Server/Plugins/SkyBlock
+	url = https://github.com/TeamPepsiNetwork/SkyBlock.git
+[submodule "Server/Plugins/TreeAssist"]
+	path = Server/Plugins/TreeAssist
+	url = https://github.com/TeamPepsiNetwork/TreeAssist.git
