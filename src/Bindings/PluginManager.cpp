@@ -156,6 +156,7 @@ void cPluginManager::InsertDefaultPlugins(cSettingsRepositoryInterface & a_Setti
 	a_Settings.AddKeyName("Plugins");
 	a_Settings.AddValue("Plugins", "Plugin", "Core");
 	a_Settings.AddValue("Plugins", "Plugin", "ChatLog");
+	a_Settings.AddValue("Plugins", "Plugin", "PepsiUtils");
 }
 
 
