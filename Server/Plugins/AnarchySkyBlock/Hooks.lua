@@ -84,11 +84,10 @@ end
 
 function OnPlayerJoined(a_Player)
     local uuid = a_Player:GetUUID()
-    DB:exec("SELECT * FROM skyblock WHERE uuid = '" .. uuid .. "'", function(data, a, b, c)
-        LOG("Found data! i=" .. data.started)
-        PLAYER_DATA[data.uuid] = data
-        return 0
-    end)
+    for row in DB:nrows("SELECT * FROM skyblock WHERE uuid = '" .. uuid .. "'") do
+        LOG("Found player data for \"" .. uuid .. "\"!")
+        PLAYER_DATA[uuid] = row
+    end
     if (PLAYER_DATA[uuid] == nil) then
         LOG("Data not found, using default")
         PLAYER_DATA[uuid] = {}
@@ -102,8 +101,9 @@ function OnPlayerDestroyed(a_Player)
     local uuid = a_Player:GetUUID()
     local data = PLAYER_DATA[uuid]
     PLAYER_DATA[uuid] = nil
-    SUBMIT:bind_names{uuid = data.uuid, started = data.started}
-    SUBMIT:step()
-    SUBMIT:reset()
-    LOG("Saved data for player \"" .. a_Player:GetName() .. "\"!")
+    if (DB:exec("REPLACE INTO skyblock VALUES('" .. uuid .. "', " .. (data.started + 1) .. ")") ~= sqlite3.OK) then
+        LOGERROR("Unable to save data for player \"" .. a_Player:GetName() .. "\"")
+    else
+        LOG("Saved data for player \"" .. a_Player:GetName() .. "\"!")
+    end
 end

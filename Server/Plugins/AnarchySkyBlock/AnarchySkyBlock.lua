@@ -17,7 +17,6 @@ SPAWN_RADIUS = -1
 WORLD = nil
 NETHER = nil
 DB = nil
-SUBMIT = nil
 
 PLAYER_DATA = {}
 
@@ -52,8 +51,10 @@ function Initialize(Plugin)
     NETHER:SetSpawn(0, 0, 0)
 
     DB = sqlite3.open(LOCAL_FOLDER .. "/database.sqlite3")
-    DB:exec("CREATE TABLE skyblock (uuid TEXT PRIMARY KEY, started INTEGER)")
-    SUBMIT = DB:prepare[[ INSERT INTO skyblock VALUES (:uuid, :started) ]]
+    if (DB:exec("CREATE TABLE IF NOT EXISTS skyblock (uuid CHAR(32) NOT NULL, started INTEGER NOT NULL, PRIMARY KEY(uuid))") ~= sqlite3.OK) then
+        LOGERROR("Unable to create table!")
+        return false
+    end
 
     LoadSpawnChunks()
 

@@ -1123,7 +1123,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 					case dtWithering:       return "is a husk of their former selves";
 					case dtOnFire:          return "forgot to stop, drop, and roll";
 					case dtFireContact:     return "burnt themselves to death";
-					case dtInVoid:          return "somehow fell out of the world";
+					case dtInVoid:          return "fell out of the world";
 					case dtPotionOfHarming: return "was magicked to death";
 					case dtEnderPearl:      return "misused an ender pearl";
 					case dtAdmin:           return "was administrator'd";

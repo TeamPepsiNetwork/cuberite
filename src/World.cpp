@@ -208,7 +208,7 @@ cWorld::cWorld(
 	m_bCommandBlocksEnabled(true),
 	m_bUseChatPrefixes(false),
 	m_TNTShrapnelLevel(slNone),
-	m_MaxViewDistance(12),
+	m_MaxViewDistance(8),
 	m_Scoreboard(this),
 	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
@@ -254,7 +254,7 @@ cWorld::cWorld(
 	m_BroadcastDeathMessages = IniFile.GetValueSetB("Broadcasting", "BroadcastDeathMessages", true);
 	m_BroadcastAchievementMessages = IniFile.GetValueSetB("Broadcasting", "BroadcastAchievementMessages", true);
 
-	SetMaxViewDistance(IniFile.GetValueSetI("SpawnPosition", "MaxViewDistance", 12));
+	SetMaxViewDistance(IniFile.GetValueSetI("SpawnPosition", "MaxViewDistance", 8));
 
 	// Try to find the "SpawnPosition" key and coord values in the world configuration, set the flag if found
 	int KeyNum = IniFile.FindKey("SpawnPosition");

@@ -1266,9 +1266,9 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 
 void cEntity::TickInVoid(cChunk & a_Chunk)
 {
-	if (m_TicksSinceLastVoidDamage == 20)
+	if (m_TicksSinceLastVoidDamage == 10)
 	{
-		TakeDamage(dtInVoid, nullptr, 2, 0);
+		TakeDamage(dtInVoid, nullptr, 5, 0);
 		m_TicksSinceLastVoidDamage = 0;
 	}
 	else
