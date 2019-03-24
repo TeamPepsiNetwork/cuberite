@@ -58,23 +58,23 @@ function OnPlayerSpawn(a_Player)
                     -- TODO store player history in a database, to limit the speed of obtaining items
                     local a_Grid = a_Player:GetInventory():GetInventoryGrid()
                     --resources
-                    a_Grid:SetSlot(0, 0, cItem(E_ITEM_LAVA_BUCKET, 1));
-                    a_Grid:SetSlot(1, 0, cItem(E_BLOCK_ICE, 2));
-                    a_Grid:SetSlot(2, 0, cItem(E_BLOCK_SAND, 8));
-                    a_Grid:SetSlot(3, 0, cItem(E_BLOCK_DIRT, 8));
-                    a_Grid:SetSlot(4, 0, cItem(E_ITEM_FLINT, 1));
+                    a_Grid:SetSlot(0, 0, cItem(E_ITEM_LAVA_BUCKET, 1))
+                    a_Grid:SetSlot(1, 0, cItem(E_BLOCK_ICE, 2))
+                    a_Grid:SetSlot(2, 0, cItem(E_BLOCK_SAND, 8))
+                    a_Grid:SetSlot(3, 0, cItem(E_BLOCK_DIRT, 8))
+                    a_Grid:SetSlot(4, 0, cItem(E_ITEM_FLINT, 1))
                     --food and other growable stuff
-                    a_Grid:SetSlot(0, 1, cItem(E_BLOCK_SAPLING, 1));
-                    a_Grid:SetSlot(1, 1, cItem(E_ITEM_MELON_SLICE, 1));
-                    a_Grid:SetSlot(2, 1, cItem(E_BLOCK_CACTUS, 1));
-                    a_Grid:SetSlot(3, 1, cItem(E_BLOCK_BROWN_MUSHROOM, 1));
-                    a_Grid:SetSlot(4, 1, cItem(E_BLOCK_RED_MUSHROOM, 1));
-                    a_Grid:SetSlot(5, 1, cItem(E_BLOCK_PUMPKIN, 1));
-                    a_Grid:SetSlot(6, 1, cItem(E_ITEM_SEEDS, 4));
-                    a_Grid:SetSlot(7, 1, cItem(E_ITEM_SUGARCANE, 1));
-                    a_Grid:SetSlot(8, 1, cItem(E_ITEM_CARROT, 1));
-                    a_Grid:SetSlot(0, 2, cItem(E_ITEM_POTATO, 1));
-                    a_Grid:SetSlot(1, 2, cItem(E_ITEM_BONE, 3));
+                    a_Grid:SetSlot(0, 1, cItem(E_BLOCK_SAPLING, 1))
+                    a_Grid:SetSlot(1, 1, cItem(E_ITEM_MELON_SLICE, 1))
+                    a_Grid:SetSlot(2, 1, cItem(E_BLOCK_CACTUS, 1))
+                    a_Grid:SetSlot(3, 1, cItem(E_BLOCK_BROWN_MUSHROOM, 1))
+                    a_Grid:SetSlot(4, 1, cItem(E_BLOCK_RED_MUSHROOM, 1))
+                    a_Grid:SetSlot(5, 1, cItem(E_BLOCK_PUMPKIN, 1))
+                    a_Grid:SetSlot(6, 1, cItem(E_ITEM_SEEDS, 4))
+                    a_Grid:SetSlot(7, 1, cItem(E_ITEM_SUGARCANE, 1))
+                    a_Grid:SetSlot(8, 1, cItem(E_ITEM_CARROT, 1))
+                    a_Grid:SetSlot(0, 2, cItem(E_ITEM_POTATO, 1))
+                    a_Grid:SetSlot(1, 2, cItem(E_ITEM_BONE, 3))
                     return
                 end
             end
@@ -83,27 +83,9 @@ function OnPlayerSpawn(a_Player)
 end
 
 function OnPlayerJoined(a_Player)
-    local uuid = a_Player:GetUUID()
-    for row in DB:nrows("SELECT * FROM skyblock WHERE uuid = '" .. uuid .. "'") do
-        LOG("Found player data for \"" .. uuid .. "\"!")
-        PLAYER_DATA[uuid] = row
-    end
-    if (PLAYER_DATA[uuid] == nil) then
-        LOG("Data not found, using default")
-        PLAYER_DATA[uuid] = {}
-        PLAYER_DATA[uuid].uuid = uuid
-        PLAYER_DATA[uuid].started = 0
-    end
-    LOG("Loaded data for player \"" .. a_Player:GetName() .. "\": " .. PLAYER_DATA[uuid].uuid .. " => " .. PLAYER_DATA[uuid].started)
+    LoadPlayerdata(a_Player)
 end
 
 function OnPlayerDestroyed(a_Player)
-    local uuid = a_Player:GetUUID()
-    local data = PLAYER_DATA[uuid]
-    PLAYER_DATA[uuid] = nil
-    if (DB:exec("REPLACE INTO skyblock VALUES('" .. uuid .. "', " .. (data.started + 1) .. ")") ~= sqlite3.OK) then
-        LOGERROR("Unable to save data for player \"" .. a_Player:GetName() .. "\"")
-    else
-        LOG("Saved data for player \"" .. a_Player:GetName() .. "\"!")
-    end
+    SavePlayerdata(a_Player)
 end

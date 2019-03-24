@@ -16,9 +16,6 @@ SPAWN_RADIUS = -1
 
 WORLD = nil
 NETHER = nil
-DB = nil
-
-PLAYER_DATA = {}
 
 function Initialize(Plugin)
     LOG("Loading " .. NAME .. " " .. VERSION .. " (version id " .. VERSION_NUMBER .. ")")
@@ -50,12 +47,7 @@ function Initialize(Plugin)
     WORLD:SetSpawn(0, 0, 0)
     NETHER:SetSpawn(0, 0, 0)
 
-    DB = sqlite3.open(LOCAL_FOLDER .. "/database.sqlite3")
-    if (DB:exec("CREATE TABLE IF NOT EXISTS skyblock (uuid CHAR(32) NOT NULL, started INTEGER NOT NULL, PRIMARY KEY(uuid))") ~= sqlite3.OK) then
-        LOGERROR("Unable to create table!")
-        return false
-    end
-
+    LoadDB()
     LoadSpawnChunks()
 
     -- Register hooks
@@ -74,7 +66,8 @@ end
 
 function OnDisable()
     LOG("Unloading " .. NAME .. " " .. VERSION .. "...")
-    DB:close()
+    CloseDB()
+    LOG(NAME .. " " .. VERSION .. " unloaded successfully!")
 end
 
 function LoadConfiguration()
@@ -93,11 +86,13 @@ function LoadConfiguration()
     configIni:AddKeyComment("Worlds", "\"World_name\" is the name of the world that will be used as the SkyBlock overworld")
     configIni:AddKeyComment("Worlds", "\"Nether_name\" is the name of the world that will be used as the SkyBlock overworld")
     configIni:AddKeyComment("General", "\"Spawn_radius\" is the radius (in chunks) of the spawn area")
+    configIni:AddKeyComment("General", "\"Start_cooldown\" number of ticks between a player being allowed to start (i.e. obtain their starter items)")
 
     -- read values from config
     WORLD_NAME = configIni:GetValueSet("Worlds", "World_name", "anarchyskyblock")
     NETHER_NAME = configIni:GetValueSet("Worlds", "Nether_name", "anarchyskyblock_nether")
     SPAWN_RADIUS = configIni:GetValueSetI("General", "Spawn_radius", 8)
+    START_COOLDOWN = configIni:GetValueSetI("General", "Start_cooldown", 1728000) -- default 1 day
 
     -- sanity check values
     if (SPAWN_RADIUS < 1) then
@@ -114,7 +109,11 @@ end
 
 function LoadLuaFiles()
     local files = {
-        "/Hooks.lua"
+        "/DB.lua",
+        "/Hooks.lua",
+        "/Playerdata.lua",
+        -- commands
+        "/command/CommandStart.lua"
     }
 
     for _, file in pairs(files) do
