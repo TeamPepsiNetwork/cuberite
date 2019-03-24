@@ -6,12 +6,16 @@ function LoadPlayerdata(a_Player)
     local uuid = a_Player:GetUUID()
     local data = nil
     for row in DB:nrows("SELECT * FROM skyblock WHERE uuid = '" .. uuid .. "'") do
-        LOG("Found player data for \"" .. uuid .. "\"!")
-        data = row
+        --LOG("Found player data for \"" .. uuid .. "\"!")
+        LOG(row.data)
+        data = cJson:Parse(row.data)
     end
     if (data == nil) then
         data = DefaultPlayerdata(a_Player)
     end
+    --for key, value in pairs(data) do
+    --    a_Player:SendMessage(key .. " " .. value)
+    --end
     PLAYER_DATA[uuid] = data
 end
 
@@ -28,12 +32,16 @@ function SavePlayerdata(a_Player)
 end
 
 function DefaultPlayerdata(a_Player)
-    return {
+    local data = {
         uuid = a_Player:GetUUID(),
         name = a_Player:GetName(),
         startTime = 0,
-        challenges = {} -- TODO: fill with false for all challenges
+        challenges = {}
     }
+    for id, _ in pairs(CHALLENGES) do
+        data.challenges[id] = false
+    end
+    return data
 end
 
 function GetPlayerdata(a_Player)

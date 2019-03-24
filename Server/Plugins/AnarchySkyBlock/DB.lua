@@ -15,7 +15,7 @@ end
 
 function CloseDB()
     if (DB ~= nil) then
-        DB.close()
+        DB:close()
         DB = nil
         return true
     else

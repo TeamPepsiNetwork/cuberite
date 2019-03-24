@@ -44,37 +44,16 @@ function OnPlayerSpawn(a_Player)
                 local feet = y > 255 and 0 or a_World:GetBlock(x, y, z)
                 local head = y > 254 and 0 or a_World:GetBlock(x, y + 1, z)
                 if (below ~= E_BLOCK_AIR
+                        and feet == E_BLOCK_AIR
+                        and head == E_BLOCK_AIR
                         and below ~= E_BLOCK_FIRE
                         and below ~= E_BLOCK_LAVA
                         and below ~= E_BLOCK_STATIONARY_LAVA
                         and below ~= E_BLOCK_WATER
                         and below ~= E_BLOCK_STATIONARY_WATER
                         and below ~= E_BLOCK_CACTUS
-                        and below ~= E_BLOCK_SIGN
-                        and feet == 0
-                        and head == 0) then
+                        and below ~= E_BLOCK_SIGN) then
                     a_Player:TeleportToCoords(x + 0.5, y, z + 0.5)
-
-                    -- TODO store player history in a database, to limit the speed of obtaining items
-                    local a_Grid = a_Player:GetInventory():GetInventoryGrid()
-                    --resources
-                    a_Grid:SetSlot(0, 0, cItem(E_ITEM_LAVA_BUCKET, 1))
-                    a_Grid:SetSlot(1, 0, cItem(E_BLOCK_ICE, 2))
-                    a_Grid:SetSlot(2, 0, cItem(E_BLOCK_SAND, 8))
-                    a_Grid:SetSlot(3, 0, cItem(E_BLOCK_DIRT, 8))
-                    a_Grid:SetSlot(4, 0, cItem(E_ITEM_FLINT, 1))
-                    --food and other growable stuff
-                    a_Grid:SetSlot(0, 1, cItem(E_BLOCK_SAPLING, 1))
-                    a_Grid:SetSlot(1, 1, cItem(E_ITEM_MELON_SLICE, 1))
-                    a_Grid:SetSlot(2, 1, cItem(E_BLOCK_CACTUS, 1))
-                    a_Grid:SetSlot(3, 1, cItem(E_BLOCK_BROWN_MUSHROOM, 1))
-                    a_Grid:SetSlot(4, 1, cItem(E_BLOCK_RED_MUSHROOM, 1))
-                    a_Grid:SetSlot(5, 1, cItem(E_BLOCK_PUMPKIN, 1))
-                    a_Grid:SetSlot(6, 1, cItem(E_ITEM_SEEDS, 4))
-                    a_Grid:SetSlot(7, 1, cItem(E_ITEM_SUGARCANE, 1))
-                    a_Grid:SetSlot(8, 1, cItem(E_ITEM_CARROT, 1))
-                    a_Grid:SetSlot(0, 2, cItem(E_ITEM_POTATO, 1))
-                    a_Grid:SetSlot(1, 2, cItem(E_ITEM_BONE, 3))
                     return
                 end
             end

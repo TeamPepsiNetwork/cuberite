@@ -48,6 +48,7 @@ function Initialize(Plugin)
     NETHER:SetSpawn(0, 0, 0)
 
     LoadDB()
+    LoadChallenges()
     LoadSpawnChunks()
 
     -- Register hooks
@@ -57,6 +58,10 @@ function Initialize(Plugin)
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_DESTROYED, OnPlayerDestroyed)
 
     -- Command Bindings
+    cPluginManager:BindCommand("/challenge", "core.build", CommandChallenge, " - View SkyBlock challenges")
+    cPluginManager:BindCommand("/start", "core.build", CommandStart, " - Get starter items for SkyBlock")
+
+    cPluginManager:BindCommand("/itemtest", "core.build", CommandItemTest, " - Debug: serialize held item to string")
 
     LOG(NAME .. " " .. VERSION .. " loaded successfully!")
 
@@ -67,6 +72,7 @@ end
 function OnDisable()
     LOG("Unloading " .. NAME .. " " .. VERSION .. "...")
     CloseDB()
+    CHALLENGES = nil
     LOG(NAME .. " " .. VERSION .. " unloaded successfully!")
 end
 
@@ -109,10 +115,13 @@ end
 
 function LoadLuaFiles()
     local files = {
+        "/Challenges.lua",
         "/DB.lua",
         "/Hooks.lua",
         "/Playerdata.lua",
         -- commands
+        "/command/CommandChallenge.lua",
+        "/command/CommandItemTest.lua",
         "/command/CommandStart.lua"
     }
 

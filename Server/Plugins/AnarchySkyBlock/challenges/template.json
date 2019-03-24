@@ -1,0 +1,11 @@
+{
+  "name": "Template",
+  "parents": [
+  ],
+  "needs": [
+    "diamond:0 * 64"
+  ],
+  "rewards": [
+    "dirt:0 * 1"
+  ]
+}
