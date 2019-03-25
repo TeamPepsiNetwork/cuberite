@@ -6,16 +6,12 @@ function LoadPlayerdata(a_Player)
     local uuid = a_Player:GetUUID()
     local data = nil
     for row in DB:nrows("SELECT * FROM skyblock WHERE uuid = '" .. uuid .. "'") do
-        --LOG("Found player data for \"" .. uuid .. "\"!")
-        LOG(row.data)
         data = cJson:Parse(row.data)
     end
     if (data == nil) then
         data = DefaultPlayerdata(a_Player)
     end
-    --for key, value in pairs(data) do
-    --    a_Player:SendMessage(key .. " " .. value)
-    --end
+    EnsurePlayerdataContainsAllChallenges(data)
     PLAYER_DATA[uuid] = data
 end
 
@@ -38,12 +34,17 @@ function DefaultPlayerdata(a_Player)
         startTime = 0,
         challenges = {}
     }
-    for id, _ in pairs(CHALLENGES) do
-        data.challenges[id] = false
-    end
     return data
 end
 
 function GetPlayerdata(a_Player)
     return PLAYER_DATA[a_Player:GetUUID()]
+end
+
+function GetCooldownString(a_Player)
+    return GetCooldownStringFromRemaining(GetPlayerdata(a_Player).startTime + START_COOLDOWN - a_Player:GetWorld():GetWorldAge())
+end
+
+function GetCooldownStringFromRemaining(remaining)
+    return math.floor(remaining / 86400) .. "d:" .. (math.floor(remaining / 3600) % 24) .. "h:" .. (math.floor(remaining / 60) % 60) .. "m:" .. math.floor(remaining % 60) .. "s"
 end

@@ -24,15 +24,9 @@ function OnPlayerSpawn(a_Player)
         return
     end
 
-    if (true) then
-        LOG("Player spawned at x=" .. a_Player:GetPosX() .. ",y=" .. a_Player:GetPosY() .. ",z=" .. a_Player:GetPosZ() .. " and has existed for " .. a_Player:GetTicksAlive() .. " ticks")
-    end
-
-    if (a_Player:GetPosX() == 0 and a_Player:GetPosY() == 0 and a_Player:GetPosZ() == 0) then
-        -- player is respawning
+    if (a_Player:GetPosX() == 0 and a_Player:GetPosY() == 0 and a_Player:GetPosZ() == 0) then -- player is respawning
         local a_BedPos = a_Player:GetLastBedPos()
-        if (a_BedPos.x == 0 and a_BedPos.y == 0 and a_BedPos.z == 0) then
-            -- player does not have a bed
+        if (a_BedPos.x == 0 and a_BedPos.y == 0 and a_BedPos.z == 0) then -- player does not have a bed
             -- find random valid spawn position
             local a_World = a_Player:GetWorld()
             while (true) do

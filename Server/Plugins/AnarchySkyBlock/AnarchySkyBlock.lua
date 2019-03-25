@@ -49,7 +49,10 @@ function Initialize(Plugin)
 
     LoadDB()
     LoadChallenges()
+    LoadStarterItems()
     LoadSpawnChunks()
+
+    cRoot:Get():ForEachPlayer(LoadPlayerdata);
 
     -- Register hooks
     cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATING, OnChunkGenerating)
@@ -70,6 +73,7 @@ function Initialize(Plugin)
 end
 
 function OnDisable()
+    cRoot:Get():ForEachPlayer(SavePlayerdata);
     LOG("Unloading " .. NAME .. " " .. VERSION .. "...")
     CloseDB()
     CHALLENGES = nil

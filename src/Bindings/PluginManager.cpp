@@ -154,6 +154,7 @@ void cPluginManager::ReloadPluginsNow(cSettingsRepositoryInterface & a_Settings)
 void cPluginManager::InsertDefaultPlugins(cSettingsRepositoryInterface & a_Settings)
 {
 	a_Settings.AddKeyName("Plugins");
+	a_Settings.AddValue("Plugins", "Plugin", "APIDump");
 	a_Settings.AddValue("Plugins", "Plugin", "Core");
 	a_Settings.AddValue("Plugins", "Plugin", "ChatLog");
 	a_Settings.AddValue("Plugins", "Plugin", "PepsiUtils");
