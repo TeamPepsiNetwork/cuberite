@@ -1,4 +1,19 @@
 CATEGORIES = nil
+NUMBERED_CATEGORIES = nil
+
+GUI_WIDTH = 9
+GUI_HEIGHT = 6
+
+function GetSlotIndex(x, y)
+    assert(x < 9, "x must be less than 9!")
+    assert(y < 9, "y must be less than 9!")
+    assert(x >= 0, "x must be greater than or equal to 0!")
+    assert(y >= 0, "y must be greater than or equal to 0!")
+    return y * GUI_WIDTH + x
+end
+
+GUI_NEXT_SLOT = GetSlotIndex(8, 5)
+GUI_PREV_SLOT = GetSlotIndex(0, 5)
 
 function LoadChallenges()
     assert(cFile:IsFolder(LOCAL_FOLDER .. "/challenges"), "Not a folder: \"" .. LOCAL_FOLDER .. "/challenges\"!")
@@ -13,7 +28,11 @@ function LoadChallenges()
         end
         category.challenges = challenges
     end
+    local i = 0
+    NUMBERED_CATEGORIES = {}
     for categoryId, category in pairs(CATEGORIES) do
+        NUMBERED_CATEGORIES[i] = category
+        i = i + 1
         local challenges = {} -- copy challenges from category
         for id, challenge in pairs(category.challenges) do
             challenges[id] = challenge
@@ -108,18 +127,36 @@ function EnsurePlayerdataContainsAllChallenges(playerdata)
 end
 
 function ShowChallengeWindowTo(a_Player)
-    if (a_Player:GetInventory():GetWindowType() ~= -1) then
+    if (a_Player:GetWindow():GetWindowType() ~= -1) then
         return
     end
-    local a_Window = cWindow(cWindow.wtChest, 9, 6, "Challenges")
+    local window = cLuaWindow(cWindow.wtChest, 9, 6, "Challenges")
     local data = GetPlayerdata(a_Player)
-    local pageX = 0
-    local pageY = 0
-    local pageData = {}
+    local pageData = {
+        page = 0
+    } -- i think i need to keep everything in a table due to passing by value instead of by reference
     local updateWindow = function()
+        a_Player:CloseWindow(false)
+        if (pageData.page < 0) then
+            pageData.page = #NUMBERED_CATEGORIES
+        elseif (pageData.page > #NUMBERED_CATEGORIES) then
+            pageData.page = 0
+        end
+        window:SetWindowTitle("Challenges - " .. NUMBERED_CATEGORIES[pageData.page].name)
+        window:GetContents():Clear()
+        window:SetSlot(a_Player, GUI_NEXT_SLOT, cItem(E_BLOCK_WOOL, 1, E_META_WOOL_LIGHTGREEN, nil, "§a§lNext page"))
+        window:SetSlot(a_Player, GUI_PREV_SLOT, cItem(E_BLOCK_WOOL, 1, E_META_WOOL_LIGHTGREEN, nil, "§a§lPrevious page"))
+        a_Player:OpenWindow(window)
     end
     window:SetOnClicked(function(a_Window, a_Player, a_SlotNum, a_ClickAction, a_ClickedItem)
+        if (a_SlotNum == GUI_NEXT_SLOT) then
+            pageData.page = pageData.page + 1
+            updateWindow()
+        elseif (a_SlotNum == GUI_PREV_SLOT) then
+            pageData.page = pageData.page - 1
+            updateWindow()
+        end
         return true -- returning true cancels the event
     end)
-    a_Player:OpenWindow(a_Window)
+    updateWindow()
 end
