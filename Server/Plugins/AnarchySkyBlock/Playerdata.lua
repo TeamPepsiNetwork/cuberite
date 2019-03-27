@@ -17,14 +17,11 @@ end
 
 function SavePlayerdata(a_Player)
     local uuid = a_Player:GetUUID()
-    local data = PLAYER_DATA[uuid];
-    if (data ~= nil) then
-        PLAYER_DATA[uuid] = nil
-        local json = cJson:Serialize(data)
-        return TryExec("REPLACE INTO skyblock VALUES('" .. uuid .. "', '" .. json .. "')")
-    else
-        return false
-    end
+    local data = PLAYER_DATA[uuid]
+    PLAYER_DATA[uuid] = nil
+    assert(data ~= nil)
+    local json = cJson:Serialize(data)
+    TryExec("REPLACE INTO skyblock VALUES('" .. uuid .. "', '" .. json .. "')")
 end
 
 function DefaultPlayerdata(a_Player)

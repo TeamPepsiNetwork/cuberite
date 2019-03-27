@@ -1,0 +1,17 @@
+{
+  "name": "Cobblestone #1",
+  "depends": [
+  ],
+  "needs": [
+    {
+      "id": "cobblestone",
+      "count": 64
+    }
+  ],
+  "rewards": [
+    {
+      "id": "dirt"
+    }
+  ],
+  "usageLimit": 3
+}

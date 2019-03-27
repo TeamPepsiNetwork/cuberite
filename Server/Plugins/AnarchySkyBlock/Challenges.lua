@@ -1,31 +1,108 @@
-CHALLENGES = nil
+CATEGORIES = nil
 
 function LoadChallenges()
-    CHALLENGES = {}
-    local count = 0
-    if (cFile:IsFolder(LOCAL_FOLDER .. "/challenges")) then
-        local files = cFile:GetFolderContents(LOCAL_FOLDER .. "/challenges")
-        for _, fileName in pairs(files) do
-            local challenge = cJson:Parse(cFile:ReadWholeFile(LOCAL_FOLDER .. "/challenges/" .. fileName))
-            local realId = ReplaceString(fileName, ".json", "")
-            if (challenge.id == nil) then
-                challenge.id = realId
-            elseif (challenge.id ~= realId) then
-                LOGWARNING("Challenge \"" .. realId .. "\" has wrong id!")
-                challenge.id = realId
+    assert(cFile:IsFolder(LOCAL_FOLDER .. "/challenges"), "Not a folder: \"" .. LOCAL_FOLDER .. "/challenges\"!")
+    assert(cFile:IsFile(LOCAL_FOLDER .. "/challenges/categories.json"), "Not a file: \"" .. LOCAL_FOLDER .. "/challenges/categories.json\"!")
+    CATEGORIES = cJson:Parse(cFile:ReadWholeFile(LOCAL_FOLDER .. "/challenges/categories.json"))
+    for _, category in pairs(CATEGORIES) do
+        local challenges = {}
+        for _, challengeId in pairs(category.challenges) do
+            local challenge = cJson:Parse(cFile:ReadWholeFile(LOCAL_FOLDER .. "/challenges/" .. category.id .. "/" .. challengeId .. ".json"))
+            challenges[challengeId] = challenge
+            challenge.id = challengeId
+        end
+        category.challenges = challenges
+    end
+    for categoryId, category in pairs(CATEGORIES) do
+        local challenges = {} -- copy challenges from category
+        for id, challenge in pairs(category.challenges) do
+            challenges[id] = challenge
+            -- replace challenge stuff with cItem instances
+            local tmp = {}
+            for key, value in pairs(challenge.needs) do
+                tmp[key] = ParseItem(value)
             end
-            CHALLENGES[challenge.id] = challenge
-            count = count + 1
+            challenge.needs = tmp
+            tmp = {}
+            for key, value in pairs(challenge.rewards) do
+                tmp[key] = ParseItem(value)
+            end
+            challenge.rewards = tmp
+        end
+        local oldCounter = 0
+        local counter = 0
+        local ordered = {}
+        while (#challenges ~= 0) do
+            for _, challenge in pairs(challenges) do
+                if (challenge.depends == nil or #challenge.depends == 0 or IsChallengeInList(challenge.id, ordered)) then
+                    ordered[counter] = challenge
+                    counter = counter + 1
+                end
+            end
+            if (oldCounter == counter) then
+                -- safeguard against infinite loop by skipping if we do a full cycle without adding any challenges
+                break
+            else
+                oldCounter = counter
+            end
+        end
+        for _, challenge in pairs(challenges) do
+            ordered[counter] = challenge
+            counter = counter + 1
+        end
+        category.ordered = ordered
+    end
+end
+
+function IsChallengeInList(id, list)
+    for _, c in pairs(list) do
+        if (c.id == id) then
+            return true
         end
     end
-    LOG("Loaded " .. count .. " challenges!")
+    return false
+end
+
+function ParseItem(desc)
+    local id, meta, count
+    if (desc.id == nil) then
+        error("Id is null!")
+    elseif (type(desc.id) == "string") then
+        id = BlockStringToType(desc.id)
+    elseif (type(desc.id) == "number") then
+        id = desc.id
+    else
+        error("Unknown type for id: \"" .. type(desc.id) .. "\"!")
+    end
+    if (desc.meta == nil) then
+        meta = 0
+    elseif (type(desc.meta) == "number") then
+        meta = desc.meta
+    else
+        error("Unknown type for meta: \"" .. type(desc.meta) .. "\"!")
+    end
+    if (desc.count == nil) then
+        count = 1
+    elseif (type(desc.count) == "number") then
+        count = desc.count
+    else
+        error("Unknown type for count: \"" .. type(desc.count) .. "\"!")
+    end
+    return cItem(id, count, meta)
 end
 
 function EnsurePlayerdataContainsAllChallenges(playerdata)
-    local dataChallenges = playerdata.challenges
-    for id, _ in pairs(CHALLENGES) do
-        if (dataChallenges[id] == nil) then
-            dataChallenges[id] = false
+    local categories = playerdata.challenges
+    for id, category in pairs(CATEGORIES) do
+        local challenges = categories[id]
+        if (challenges == nil) then
+            categories[id] = {}
+            challenges = categories[id]
+        end
+        for subId, challenge in pairs(category.challenges) do
+            if (challenges[subId] == nil) then
+                challenges[subId] = 0
+            end
         end
     end
 end
@@ -39,7 +116,8 @@ function ShowChallengeWindowTo(a_Player)
     local pageX = 0
     local pageY = 0
     local pageData = {}
-    local updateWindow = function() end
+    local updateWindow = function()
+    end
     window:SetOnClicked(function(a_Window, a_Player, a_SlotNum, a_ClickAction, a_ClickedItem)
         return true -- returning true cancels the event
     end)

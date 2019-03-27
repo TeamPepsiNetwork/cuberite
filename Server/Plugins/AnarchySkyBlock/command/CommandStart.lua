@@ -28,20 +28,19 @@ function LoadStarterItems()
         STARTER_ITEMS:Add(cItem(E_ITEM_BONE, 3))
     else
         -- also set starter items, but based on config
-        if (cFile:IsFile(LOCAL_FOLDER .. "/startitems.json")) then
-            local i = 0
-            local startItems = cJson:Parse(cFile:ReadWholeFile(LOCAL_FOLDER .. "/startitems.json"))
-            for _, item in pairs(startItems) do
-                if (item.id ~= nil) then
-                    local type = BlockStringToType(item.id)
-                    local meta = item.meta == nil and 0 or item.meta
-                    local count = item.count == nil and 1 or item.count
-                    STARTER_ITEMS:Add(cItem(type, count, meta))
-                    i = i + 1
-                end
+        assert(cFile:IsFile(LOCAL_FOLDER .. "/startitems.json"), "Not a file: \"" .. LOCAL_FOLDER .. "/startitems.json\"!")
+        local i = 0
+        local startItems = cJson:Parse(cFile:ReadWholeFile(LOCAL_FOLDER .. "/startitems.json"))
+        for _, item in pairs(startItems) do
+            if (item.id ~= nil) then
+                local type = BlockStringToType(item.id)
+                local meta = item.meta == nil and 0 or item.meta
+                local count = item.count == nil and 1 or item.count
+                STARTER_ITEMS:Add(cItem(type, count, meta))
+                i = i + 1
             end
-            LOG("Loaded " .. i .. " starter items!")
         end
+        LOG("Loaded " .. i .. " starter items!")
     end
 end
 

@@ -1,0 +1,17 @@
+{
+  "name": "Wood #1",
+  "depends": [
+  ],
+  "needs": [
+    {
+      "id": "log",
+      "count": 64
+    }
+  ],
+  "rewards": [
+    {
+      "id": "sand"
+    }
+  ],
+  "usageLimit": 3
+}

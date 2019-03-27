@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Cobblestone",
+    "id": "cobblestone",
+    "challenges": [
+      "cobble1"
+    ]
+  },
+  {
+    "name": "Wood",
+    "id": "wood",
+    "challenges": [
+      "wood1"
+    ]
+  }
+]
