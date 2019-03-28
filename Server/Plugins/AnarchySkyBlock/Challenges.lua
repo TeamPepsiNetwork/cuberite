@@ -32,6 +32,14 @@ function LoadChallenges()
         end
         category.challenges = challenges
     end
+    INDEXED_CHALLENGES = {}
+    for _, category in pairs(CATEGORIES) do
+        for id, challenge in pairs(category.challenges) do
+            local fullId = category.id .. "." .. id
+            INDEXED_CHALLENGES[fullId] = challenge
+            challenge.fullId = fullId
+        end
+    end
     local i = 1
     NUMBERED_CATEGORIES = {}
     for categoryId, category in pairs(CATEGORIES) do
@@ -53,47 +61,45 @@ function LoadChallenges()
             challenge.rewards = tmp
             challenge.display = PreParseItem(challenge.display).realItems[1]
         end
-        local oldCounter = 0
-        local counter = 1
+        local counter = 0
         local ordered = {}
-        while (#challenges ~= 0) do
+        while (TableLength(challenges) > counter) do
             for _, challenge in pairs(challenges) do
-                if (challenge.depends == nil or #challenge.depends == 0 or IsChallengeInList(challenge.id, ordered)) then
-                    ordered[counter] = challenge
+                if (not IsChallengeInList(challenge.fullId, ordered) and (challenge.depends == nil or AreAllDependenciesInList(challenge, ordered))) then
                     counter = counter + 1
+                    ordered[counter] = challenge
                 end
             end
-            if (oldCounter == counter) then
-                -- safeguard against infinite loop by skipping if we do a full cycle without adding any challenges
-                break
-            else
-                oldCounter = counter
-            end
-        end
-        for _, challenge in pairs(challenges) do
-            ordered[counter] = challenge
-            counter = counter + 1
         end
         category.ordered = ordered
     end
-    INDEXED_CHALLENGES = {}
-    for _, category in pairs(CATEGORIES) do
-        for id, challenge in pairs(category.challenges) do
-            local fullId = category.id .. "." .. id
-            INDEXED_CHALLENGES[fullId] = challenge
-            challenge.fullId = fullId
-            --LOG(fullId)
+end
+
+function AreAllDependenciesInList(challenge, list)
+    for _, dep in pairs(challenge.depends) do
+        if (not IsChallengeInList(dep, list)) then
+            --LOG("Dependency " .. dep .. " not found.")
+            return false
         end
     end
+    return true
 end
 
 function IsChallengeInList(id, list)
     for _, c in pairs(list) do
-        if (c.id == id) then
+        if (c.fullId == id) then
+            --LOG(id .. " found!")
             return true
         end
     end
+    --LOG(id .. " not found.")
     return false
+end
+
+function TableLength(T)
+    local count = 0
+    for _ in pairs(T) do count = count + 1 end
+    return count
 end
 
 function PreParseItem(desc)
@@ -196,7 +202,7 @@ function ShowChallengeWindowTo(a_Player)
                 i = i + 1
             end
             local dependenciesFufilled = true
-            if (#challenge.depends > 0) then
+            if (challenge.depends ~= nil and #challenge.depends > 0) then
                 lore[i] = "§7Requires:"
                 i = i + 1
                 for _, challengeId in pairs(challenge.depends) do
@@ -208,7 +214,7 @@ function ShowChallengeWindowTo(a_Player)
                     end
                 end
             end
-            local usable = usedCount < challenge.usageLimit
+            local usable = challenge.usageLimit == -1 or usedCount < challenge.usageLimit
             if (not dependenciesFufilled) then
                 displayItem.m_ItemType = E_BLOCK_WOOL
                 displayItem.m_ItemDamage = E_META_WOOL_RED
@@ -217,33 +223,39 @@ function ShowChallengeWindowTo(a_Player)
                 displayItem.m_ItemDamage = 0
             end
             displayItem.m_CustomName = (dependenciesFufilled and (usable and "§a" or "§7") or "§c") .. "§l" .. challenge.name
-            lore[1] = "§9Remaining uses: " .. (usable and "§a" or "§7") .. (challenge.usageLimit - usedCount) .. "/" .. challenge.usageLimit
+            lore[1] = "§9Remaining uses: " .. (dependenciesFufilled and usable and "§a" or "§7") .. (challenge.usageLimit == -1 and "Unlimited" or (challenge.usageLimit - usedCount) .. "/" .. challenge.usageLimit)
             displayItem.m_LoreTable = lore
             grid:SetSlot(id - 1, displayItem)
         end
         a_Player:OpenWindow(window)
     end
     window:SetOnClicked(function(a_Window, a_Player, a_SlotNum, a_ClickAction, a_ClickedItem)
-        if (a_SlotNum == GUI_NEXT_SLOT) then
-            pageData.page = pageData.page + 1
-            updateWindow()
-        elseif (a_SlotNum == GUI_PREV_SLOT) then
-            pageData.page = pageData.page - 1
-            updateWindow()
-        elseif (a_SlotNum < 9 * 5 and not a_ClickedItem:IsEmpty()) then
-            if (a_ClickedItem.m_ItemType == E_BLOCK_WOOL and a_ClickedItem.m_ItemDamage == E_META_WOOL_RED) then
-                a_Player:SendMessage("§cComplete all previous challenges first!")
-            elseif (a_ClickedItem.m_ItemType == E_BLOCK_IRON_BARS and a_ClickedItem.m_ItemDamage == 0) then
-                a_Player:SendMessage("§cYou've used this challenge too many times!")
-            else
-                local category = pageData.category
-                local challenge = category.ordered[a_SlotNum + 1]
-                if (TryCompleteChallenge(a_Player, challenge)) then
-                    updateWindow()
+        --LOG(a_SlotNum)
+        if (a_SlotNum < 9 * 6) then
+            if (a_SlotNum == GUI_NEXT_SLOT) then
+                pageData.page = pageData.page + 1
+                updateWindow()
+            elseif (a_SlotNum == GUI_PREV_SLOT) then
+                pageData.page = pageData.page - 1
+                updateWindow()
+            elseif (not a_ClickedItem:IsEmpty()) then
+                if (a_ClickedItem.m_ItemType == E_BLOCK_WOOL and a_ClickedItem.m_ItemDamage == E_META_WOOL_RED) then
+                    a_Player:SendMessage("§cComplete all previous challenges first!")
+                elseif (a_ClickedItem.m_ItemType == E_BLOCK_IRON_BARS and a_ClickedItem.m_ItemDamage == 0) then
+                    a_Player:SendMessage("§cYou've used this challenge too many times!")
+                else
+                    local category = pageData.category
+                    local challenge = category.ordered[a_SlotNum + 1]
+                    if (TryCompleteChallenge(a_Player, challenge)) then
+                        updateWindow()
+                    end
                 end
             end
         end
-        return true -- returning true cancels the event
+        if ((a_SlotNum >= 0 and a_SlotNum < 9 * 6) or a_ClickAction == caShiftLeftClick or a_ClickAction == caShiftRightClick) then
+            --LOG("Returning true")
+            return true
+        end
     end)
     updateWindow()
 end
@@ -251,11 +263,11 @@ end
 function TryCompleteChallenge(a_Player, challenge)
     local inventory = a_Player:GetInventory()
     for _, item in pairs(challenge.needs) do
-        LOG("Checking for item: " .. item.id .. ":" .. item.meta .. " x" .. item.count)
+        --LOG("Checking for item: " .. item.id .. ":" .. item.meta .. " x" .. item.count)
         local count = inventory:HowManyItems(item.realItems[1])
-        LOG("Found " .. count .. " items")
+        --LOG("Found " .. count .. " items")
         if (count < item.count) then
-            LOG("Not present!")
+            --LOG("Not present!")
             a_Player:SendMessage("§cMissing items: §l" .. ItemDisplayName(item) .. " x" .. (item.count - count))
             return false
         end

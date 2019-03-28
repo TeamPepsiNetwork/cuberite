@@ -1,19 +1,19 @@
 {
-  "name": "Wood #1",
+  "name": "Cobblestone #1",
   "depends": null,
   "needs": [
     {
-      "id": "log",
+      "id": "cobblestone",
       "count": 64
     }
   ],
   "rewards": [
     {
-      "id": "sand"
+      "id": "dirt"
     }
   ],
   "display": {
-    "id": "log"
+    "id": "cobblestone"
   },
   "usageLimit": 3
 }

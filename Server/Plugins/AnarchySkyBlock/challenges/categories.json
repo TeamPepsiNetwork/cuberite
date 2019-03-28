@@ -3,15 +3,19 @@
     "cobblestone": "Cobblestone",
     "dirt": "Dirt",
     "log": "Oak Wood",
-    "oaklog": "Oak Wood"
+    "oaklog": "Oak Wood",
+    "sand": "Sand"
   },
   "categories": [
     {
-      "name": "Cobblestone",
-      "id": "cobblestone",
+      "name": "Mining",
+      "id": "mining",
       "challenges": [
         "cobble1",
-        "cobble2"
+        "cobble2",
+        "cobble3",
+        "cobble4",
+        "cobble5"
       ]
     },
     {
