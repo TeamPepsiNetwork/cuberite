@@ -1,5 +1,7 @@
 CATEGORIES = nil
+ITEM_DISPLAY_NAMES = nil
 NUMBERED_CATEGORIES = nil
+INDEXED_CHALLENGES = nil
 
 GUI_WIDTH = 9
 GUI_HEIGHT = 6
@@ -19,6 +21,8 @@ function LoadChallenges()
     assert(cFile:IsFolder(LOCAL_FOLDER .. "/challenges"), "Not a folder: \"" .. LOCAL_FOLDER .. "/challenges\"!")
     assert(cFile:IsFile(LOCAL_FOLDER .. "/challenges/categories.json"), "Not a file: \"" .. LOCAL_FOLDER .. "/challenges/categories.json\"!")
     CATEGORIES = cJson:Parse(cFile:ReadWholeFile(LOCAL_FOLDER .. "/challenges/categories.json"))
+    ITEM_DISPLAY_NAMES = CATEGORIES.names
+    CATEGORIES = CATEGORIES.categories
     for _, category in pairs(CATEGORIES) do
         local challenges = {}
         for _, challengeId in pairs(category.challenges) do
@@ -28,7 +32,7 @@ function LoadChallenges()
         end
         category.challenges = challenges
     end
-    local i = 0
+    local i = 1
     NUMBERED_CATEGORIES = {}
     for categoryId, category in pairs(CATEGORIES) do
         NUMBERED_CATEGORIES[i] = category
@@ -47,9 +51,10 @@ function LoadChallenges()
                 tmp[key] = ParseItem(value)
             end
             challenge.rewards = tmp
+            challenge.display = ParseItem(challenge.display)
         end
         local oldCounter = 0
-        local counter = 0
+        local counter = 1
         local ordered = {}
         while (#challenges ~= 0) do
             for _, challenge in pairs(challenges) do
@@ -71,6 +76,14 @@ function LoadChallenges()
         end
         category.ordered = ordered
     end
+    INDEXED_CHALLENGES = {}
+    for categoryId, category in pairs(CATEGORIES) do
+        for id, challenge in pairs(category.challenges) do
+            local fullId = categoryId .. "." .. id
+            INDEXED_CHALLENGES[fullId] = challenge
+            challenge.fullId = fullId
+        end
+    end
 end
 
 function IsChallengeInList(id, list)
@@ -83,6 +96,8 @@ function IsChallengeInList(id, list)
 end
 
 function ParseItem(desc)
+    assert(desc ~= nil, "Parameter is null!")
+    assert(type(desc) == "table", "Parameter is not a table: \"" .. type(desc) .. "\"!")
     local id, meta, count
     if (desc.id == nil) then
         error("Id is null!")
@@ -111,17 +126,9 @@ function ParseItem(desc)
 end
 
 function EnsurePlayerdataContainsAllChallenges(playerdata)
-    local categories = playerdata.challenges
-    for id, category in pairs(CATEGORIES) do
-        local challenges = categories[id]
-        if (challenges == nil) then
-            categories[id] = {}
-            challenges = categories[id]
-        end
-        for subId, challenge in pairs(category.challenges) do
-            if (challenges[subId] == nil) then
-                challenges[subId] = 0
-            end
+    for id, _ in pairs(INDEXED_CHALLENGES) do
+        if (playerdata.challenges[id] == nil) then
+            playerdata.challenges[id] = 0
         end
     end
 end
@@ -131,21 +138,67 @@ function ShowChallengeWindowTo(a_Player)
         return
     end
     local window = cLuaWindow(cWindow.wtChest, 9, 6, "Challenges")
+    local grid = window:GetContents()
     local data = GetPlayerdata(a_Player)
     local pageData = {
-        page = 0
+        page = 1
     } -- i think i need to keep everything in a table due to passing by value instead of by reference
     local updateWindow = function()
         a_Player:CloseWindow(false)
-        if (pageData.page < 0) then
+        if (pageData.page <= 0) then
             pageData.page = #NUMBERED_CATEGORIES
         elseif (pageData.page > #NUMBERED_CATEGORIES) then
-            pageData.page = 0
+            pageData.page = 1
         end
-        window:SetWindowTitle("Challenges - " .. NUMBERED_CATEGORIES[pageData.page].name)
-        window:GetContents():Clear()
-        window:SetSlot(a_Player, GUI_NEXT_SLOT, cItem(E_BLOCK_WOOL, 1, E_META_WOOL_LIGHTGREEN, nil, "§a§lNext page"))
-        window:SetSlot(a_Player, GUI_PREV_SLOT, cItem(E_BLOCK_WOOL, 1, E_META_WOOL_LIGHTGREEN, nil, "§a§lPrevious page"))
+        pageData.category = NUMBERED_CATEGORIES[pageData.page]
+        local category = pageData.category
+        window:SetWindowTitle("Challenges - " .. category.name)
+        grid:Clear()
+        grid:SetSlot(GUI_NEXT_SLOT, cItem(E_BLOCK_WOOL, 1, E_META_WOOL_LIGHTGREEN, nil, "§a§lNext page"))
+        grid:SetSlot(GUI_PREV_SLOT, cItem(E_BLOCK_WOOL, 1, E_META_WOOL_LIGHTGREEN, nil, "§a§lPrevious page"))
+        for id, challenge in pairs(category.ordered) do
+            local displayItem = cItem(challenge.display)
+            local usedCount = data.challenges[challenge.fullId]
+            assert(usedCount ~= nil, challenge.fullId)
+            local lore = {}
+            lore[2] = "§7Needed:"
+            local i = 3
+            for _, item in pairs(challenge.needs) do
+                lore[i] = "- " .. ItemDisplayName(item) .. " x" .. item.m_ItemCount
+                i = i + 1
+            end
+            lore[i] = "§7Rewards:"
+            i = i + 1
+            for _, item in pairs(challenge.rewards) do
+                lore[i] = "- " .. ItemDisplayName(item) .. " x" .. item.m_ItemCount
+                i = i + 1
+            end
+            local dependenciesFufilled = true
+            if (#challenge.depends > 0) then
+                lore[i] = "§7Requires:"
+                i = i + 1
+                for _, challengeId in pairs(challenge.depends) do
+                    local fufilled = data.challenge[challengeId] > 0
+                    lore[i] = (fufilled and "§a" or "§c") .. "- " .. INDEXED_CHALLENGES[challengeId]
+                    i = i + 1
+                    if (not fufilled) then
+                        dependenciesFufilled = false
+                    end
+                end
+            end
+            local usable = usedCount < challenge.usageLimit
+            if (not dependenciesFufilled) then
+                displayItem.m_ItemType = E_BLOCK_WOOL
+                displayItem.m_ItemDamage = E_META_WOOL_RED
+            elseif (not usable) then
+                displayItem.m_ItemType = E_BLOCK_GLASS_PANE
+                displayItem.m_ItemDamage = E_META_STAINED_GLASS_PANE_GRAY
+            end
+            displayItem.m_CustomName = (dependenciesFufilled and (usable and "§a" or "§7") or "§c") .. "§l" .. challenge.name
+            lore[1] = "§9Remaining uses: " .. (usable and "§a" or "§7") .. (challenge.usageLimit - usedCount) .. "/" .. challenge.usageLimit
+            displayItem.m_LoreTable = lore
+            grid:SetSlot(id - 1, displayItem)
+        end
         a_Player:OpenWindow(window)
     end
     window:SetOnClicked(function(a_Window, a_Player, a_SlotNum, a_ClickAction, a_ClickedItem)
@@ -159,4 +212,9 @@ function ShowChallengeWindowTo(a_Player)
         return true -- returning true cancels the event
     end)
     updateWindow()
+end
+
+function ItemDisplayName(a_Item)
+    local name = ITEM_DISPLAY_NAMES[ItemToString(a_Item)]
+    return name == nil and ItemToString(a_Item) or name
 end

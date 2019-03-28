@@ -13,5 +13,8 @@
       "id": "dirt"
     }
   ],
+  "display": {
+    "id": "cobblestone"
+  },
   "usageLimit": 3
 }
