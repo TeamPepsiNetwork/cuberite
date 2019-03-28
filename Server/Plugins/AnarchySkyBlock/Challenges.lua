@@ -43,15 +43,15 @@ function LoadChallenges()
             -- replace challenge stuff with cItem instances
             local tmp = {}
             for key, value in pairs(challenge.needs) do
-                tmp[key] = ParseItem(value)
+                tmp[key] = PreParseItem(value)
             end
             challenge.needs = tmp
             tmp = {}
             for key, value in pairs(challenge.rewards) do
-                tmp[key] = ParseItem(value)
+                tmp[key] = PreParseItem(value)
             end
             challenge.rewards = tmp
-            challenge.display = ParseItem(challenge.display)
+            challenge.display = PreParseItem(challenge.display).realItems[1]
         end
         local oldCounter = 0
         local counter = 1
@@ -77,11 +77,12 @@ function LoadChallenges()
         category.ordered = ordered
     end
     INDEXED_CHALLENGES = {}
-    for categoryId, category in pairs(CATEGORIES) do
+    for _, category in pairs(CATEGORIES) do
         for id, challenge in pairs(category.challenges) do
-            local fullId = categoryId .. "." .. id
+            local fullId = category.id .. "." .. id
             INDEXED_CHALLENGES[fullId] = challenge
             challenge.fullId = fullId
+            --LOG(fullId)
         end
     end
 end
@@ -95,16 +96,16 @@ function IsChallengeInList(id, list)
     return false
 end
 
-function ParseItem(desc)
+function PreParseItem(desc)
     assert(desc ~= nil, "Parameter is null!")
     assert(type(desc) == "table", "Parameter is not a table: \"" .. type(desc) .. "\"!")
     local id, meta, count
     if (desc.id == nil) then
         error("Id is null!")
     elseif (type(desc.id) == "string") then
-        id = BlockStringToType(desc.id)
-    elseif (type(desc.id) == "number") then
         id = desc.id
+    elseif (type(desc.id) == "number") then
+        id = ItemTypeToString(desc.id)
     else
         error("Unknown type for id: \"" .. type(desc.id) .. "\"!")
     end
@@ -122,7 +123,26 @@ function ParseItem(desc)
     else
         error("Unknown type for count: \"" .. type(desc.count) .. "\"!")
     end
-    return cItem(id, count, meta)
+    --LOG(count)
+    return {
+        id = id,
+        meta = meta,
+        count = count,
+        realItems = ParseItems(BlockStringToType(id), meta, count)
+    }
+end
+
+function ParseItems(id, meta, count)
+    local a = {}
+    local i = 1
+    local c = count
+    while (c > 0) do
+        local min = math.min(64, c)
+        a[i] = cItem(id, min, meta)
+        c = c - min
+        i = i + 1
+    end
+    return a
 end
 
 function EnsurePlayerdataContainsAllChallenges(playerdata)
@@ -157,6 +177,8 @@ function ShowChallengeWindowTo(a_Player)
         grid:SetSlot(GUI_NEXT_SLOT, cItem(E_BLOCK_WOOL, 1, E_META_WOOL_LIGHTGREEN, nil, "§a§lNext page"))
         grid:SetSlot(GUI_PREV_SLOT, cItem(E_BLOCK_WOOL, 1, E_META_WOOL_LIGHTGREEN, nil, "§a§lPrevious page"))
         for id, challenge in pairs(category.ordered) do
+            --LOG("Displaying challenge: " .. challenge.fullId)
+            --LOG("id=" .. challenge.display.m_ItemType .. ", count=" .. challenge.display.m_ItemCount)
             local displayItem = cItem(challenge.display)
             local usedCount = data.challenges[challenge.fullId]
             assert(usedCount ~= nil, challenge.fullId)
@@ -164,13 +186,13 @@ function ShowChallengeWindowTo(a_Player)
             lore[2] = "§7Needed:"
             local i = 3
             for _, item in pairs(challenge.needs) do
-                lore[i] = "- " .. ItemDisplayName(item) .. " x" .. item.m_ItemCount
+                lore[i] = "- " .. ItemDisplayName(item) .. " x" .. item.count
                 i = i + 1
             end
             lore[i] = "§7Rewards:"
             i = i + 1
             for _, item in pairs(challenge.rewards) do
-                lore[i] = "- " .. ItemDisplayName(item) .. " x" .. item.m_ItemCount
+                lore[i] = "- " .. ItemDisplayName(item) .. " x" .. item.count
                 i = i + 1
             end
             local dependenciesFufilled = true
@@ -178,8 +200,8 @@ function ShowChallengeWindowTo(a_Player)
                 lore[i] = "§7Requires:"
                 i = i + 1
                 for _, challengeId in pairs(challenge.depends) do
-                    local fufilled = data.challenge[challengeId] > 0
-                    lore[i] = (fufilled and "§a" or "§c") .. "- " .. INDEXED_CHALLENGES[challengeId]
+                    local fufilled = data.challenges[challengeId] > 0
+                    lore[i] = (fufilled and "§a" or "§c") .. "- " .. INDEXED_CHALLENGES[challengeId].name
                     i = i + 1
                     if (not fufilled) then
                         dependenciesFufilled = false
@@ -191,8 +213,8 @@ function ShowChallengeWindowTo(a_Player)
                 displayItem.m_ItemType = E_BLOCK_WOOL
                 displayItem.m_ItemDamage = E_META_WOOL_RED
             elseif (not usable) then
-                displayItem.m_ItemType = E_BLOCK_GLASS_PANE
-                displayItem.m_ItemDamage = E_META_STAINED_GLASS_PANE_GRAY
+                displayItem.m_ItemType = E_BLOCK_IRON_BARS
+                displayItem.m_ItemDamage = 0
             end
             displayItem.m_CustomName = (dependenciesFufilled and (usable and "§a" or "§7") or "§c") .. "§l" .. challenge.name
             lore[1] = "§9Remaining uses: " .. (usable and "§a" or "§7") .. (challenge.usageLimit - usedCount) .. "/" .. challenge.usageLimit
@@ -208,13 +230,54 @@ function ShowChallengeWindowTo(a_Player)
         elseif (a_SlotNum == GUI_PREV_SLOT) then
             pageData.page = pageData.page - 1
             updateWindow()
+        elseif (a_SlotNum < 9 * 5 and not a_ClickedItem:IsEmpty()) then
+            if (a_ClickedItem.m_ItemType == E_BLOCK_WOOL and a_ClickedItem.m_ItemDamage == E_META_WOOL_RED) then
+                a_Player:SendMessage("§cComplete all previous challenges first!")
+            elseif (a_ClickedItem.m_ItemType == E_BLOCK_IRON_BARS and a_ClickedItem.m_ItemDamage == 0) then
+                a_Player:SendMessage("§cYou've used this challenge too many times!")
+            else
+                local category = pageData.category
+                local challenge = category.ordered[a_SlotNum + 1]
+                if (TryCompleteChallenge(a_Player, challenge)) then
+                    updateWindow()
+                end
+            end
         end
         return true -- returning true cancels the event
     end)
     updateWindow()
 end
 
-function ItemDisplayName(a_Item)
-    local name = ITEM_DISPLAY_NAMES[ItemToString(a_Item)]
-    return name == nil and ItemToString(a_Item) or name
+function TryCompleteChallenge(a_Player, challenge)
+    local inventory = a_Player:GetInventory()
+    for _, item in pairs(challenge.needs) do
+        LOG("Checking for item: " .. item.id .. ":" .. item.meta .. " x" .. item.count)
+        local count = inventory:HowManyItems(item.realItems[1])
+        LOG("Found " .. count .. " items")
+        if (count < item.count) then
+            LOG("Not present!")
+            a_Player:SendMessage("§cMissing items: §l" .. ItemDisplayName(item) .. " x" .. (item.count - count))
+            return false
+        end
+    end
+    for _, item in pairs(challenge.needs) do
+        for _, realItem in pairs(item.realItems) do
+            inventory:RemoveItem(realItem)
+        end
+    end
+    for _, item in pairs(challenge.rewards) do
+        for _, realItem in pairs(item.realItems) do
+            inventory:AddItem(realItem)
+        end
+    end
+    local challengesData = GetPlayerdata(a_Player).challenges
+    challengesData[challenge.fullId] = challengesData[challenge.fullId] + 1
+    a_Player:SendMessage("§aCompleted challenge: §l" .. challenge.name .. "§r§a!")
+    return true
+end
+
+function ItemDisplayName(desc)
+    local id = desc.id .. (desc.meta == 0 and "" or ":" .. desc.meta)
+    local name = ITEM_DISPLAY_NAMES[id]
+    return name == nil and id or name
 end

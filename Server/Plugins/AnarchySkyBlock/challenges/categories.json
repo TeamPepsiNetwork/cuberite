@@ -10,7 +10,8 @@
       "name": "Cobblestone",
       "id": "cobblestone",
       "challenges": [
-        "cobble1"
+        "cobble1",
+        "cobble2"
       ]
     },
     {
