@@ -189,8 +189,8 @@ function ShowChallengeWindowTo(a_Player)
             local usedCount = data.challenges[challenge.fullId]
             assert(usedCount ~= nil, challenge.fullId)
             local lore = {}
-            lore[2] = "§7Needed:"
-            local i = 3
+            lore[3] = "§7Needed:"
+            local i = 4
             for _, item in pairs(challenge.needs) do
                 lore[i] = "- " .. ItemDisplayName(item) .. " x" .. item.count
                 i = i + 1
@@ -224,6 +224,7 @@ function ShowChallengeWindowTo(a_Player)
             end
             displayItem.m_CustomName = (dependenciesFufilled and (usable and "§a" or "§7") or "§c") .. "§l" .. challenge.name
             lore[1] = "§9Remaining uses: " .. (dependenciesFufilled and usable and "§a" or "§7") .. (challenge.usageLimit == -1 and "Unlimited" or (challenge.usageLimit - usedCount) .. "/" .. challenge.usageLimit)
+            lore[2] = "§9Times used:     " .. (usedCount > 0 and "§a" or "§7") .. usedCount
             displayItem.m_LoreTable = lore
             grid:SetSlot(id - 1, displayItem)
         end

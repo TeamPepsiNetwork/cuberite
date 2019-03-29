@@ -1,22 +1,22 @@
 {
-  "name": "Cobblestone #3",
+  "name": "Wood #3",
   "depends": [
-    "mining.cobble2"
+    "wood.wood2"
   ],
   "needs": [
     {
-      "id": "cobblestone",
+      "id": "log",
       "count": 512
     }
   ],
   "rewards": [
     {
-      "id": "dirt",
+      "id": "sand",
       "count": 12
     }
   ],
   "display": {
-    "id": "cobblestone"
+    "id": "log"
   },
   "usageLimit": 3
 }

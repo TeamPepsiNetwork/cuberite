@@ -1,15 +1,18 @@
 {
-  "name": "Wood #1",
-  "depends": null,
+  "name": "Wood #4",
+  "depends": [
+    "wood.wood3"
+  ],
   "needs": [
     {
       "id": "log",
-      "count": 64
+      "count": 1024
     }
   ],
   "rewards": [
     {
-      "id": "sand"
+      "id": "sand",
+      "count": 28
     }
   ],
   "display": {

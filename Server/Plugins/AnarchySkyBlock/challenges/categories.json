@@ -4,7 +4,8 @@
     "dirt": "Dirt",
     "log": "Oak Wood",
     "oaklog": "Oak Wood",
-    "sand": "Sand"
+    "sand": "Sand",
+    "stone": "Stone"
   },
   "categories": [
     {
@@ -15,7 +16,12 @@
         "cobble2",
         "cobble3",
         "cobble4",
-        "cobble5"
+        "cobble5",
+        "stone1",
+        "stone2",
+        "stone3",
+        "stone4",
+        "stone5"
       ]
     },
     {
