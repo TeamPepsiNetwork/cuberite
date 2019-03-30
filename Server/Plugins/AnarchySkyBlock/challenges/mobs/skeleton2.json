@@ -20,7 +20,8 @@
     }
   ],
   "display": {
-    "id": "bone"
+    "id": "bone",
+    "count": 2
   },
   "usageLimit": -1
 }

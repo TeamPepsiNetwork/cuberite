@@ -16,7 +16,8 @@
     }
   ],
   "display": {
-    "id": "string"
+    "id": "string",
+    "count": 2
   },
   "usageLimit": -1
 }

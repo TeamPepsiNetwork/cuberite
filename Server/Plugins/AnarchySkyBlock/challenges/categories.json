@@ -33,6 +33,9 @@
       "challenges": [
         "apple1",
         "carrot1",
+        "melons1",
+        "melons2",
+        "melons3",
         "potato1",
         "wood1",
         "wood2",
@@ -58,7 +61,7 @@
       ]
     },
     {
-      "name": "Mobs",
+      "name": "Hunting",
       "id": "mobs",
       "challenges": [
         "creeper1",

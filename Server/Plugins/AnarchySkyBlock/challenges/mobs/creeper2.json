@@ -16,7 +16,8 @@
     }
   ],
   "display": {
-    "id": "gunpowder"
+    "id": "gunpowder",
+    "count": 2
   },
   "usageLimit": -1
 }

@@ -16,7 +16,8 @@
     }
   ],
   "display": {
-    "id": "log"
+    "id": "log",
+    "count": 2
   },
   "usageLimit": 3
 }

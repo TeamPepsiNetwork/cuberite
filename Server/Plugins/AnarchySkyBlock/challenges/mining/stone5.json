@@ -17,7 +17,8 @@
     }
   ],
   "display": {
-    "id": "stone"
+    "id": "stone",
+    "count": 5
   },
   "usageLimit": -1
 }

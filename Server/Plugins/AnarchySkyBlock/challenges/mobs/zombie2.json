@@ -16,7 +16,8 @@
     }
   ],
   "display": {
-    "id": "rottenflesh"
+    "id": "rottenflesh",
+    "count": 2
   },
   "usageLimit": -1
 }

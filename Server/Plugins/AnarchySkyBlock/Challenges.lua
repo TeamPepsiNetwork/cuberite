@@ -16,6 +16,8 @@ end
 
 GUI_NEXT_SLOT = GetSlotIndex(8, 5)
 GUI_PREV_SLOT = GetSlotIndex(0, 5)
+GUI_TOGGLE_USED_CHALLENGES = GetSlotIndex(2, 5)
+GUI_TOGGLE_INACCESSIBLE_CHALLENGES = GetSlotIndex(3, 5)
 
 function LoadChallenges()
     assert(cFile:IsFolder(LOCAL_FOLDER .. "/challenges"), "Not a folder: \"" .. LOCAL_FOLDER .. "/challenges\"!")
@@ -107,7 +109,9 @@ end
 
 function TableLength(T)
     local count = 0
-    for _ in pairs(T) do count = count + 1 end
+    for _ in pairs(T) do
+        count = count + 1
+    end
     return count
 end
 
@@ -176,10 +180,18 @@ function ShowChallengeWindowTo(a_Player)
     local grid = window:GetContents()
     local data = GetPlayerdata(a_Player)
     local pageData = {
-        page = 1
+        page = 1,
+        challenges = {}
     } -- i think i need to keep everything in a table due to passing by value instead of by reference
-    local updateWindow = function()
-        a_Player:CloseWindow(false)
+    local updateWindow = function(force)
+        if (not force and a_Player:GetWindow():GetWindowTitle() ~= window:GetWindowTitle()) then
+            --LOG("Forcing gui refresh... Current GUI is named: \"" .. a_Player:GetWindow():GetWindowTitle() .. "\"")
+            force = true
+        end
+        --LOG("Full GUI refresh: " .. (force and "true" or "false"))
+        if (force) then
+            a_Player:CloseWindow(false)
+        end
         if (pageData.page <= 0) then
             pageData.page = #NUMBERED_CATEGORIES
         elseif (pageData.page > #NUMBERED_CATEGORIES) then
@@ -189,9 +201,29 @@ function ShowChallengeWindowTo(a_Player)
         local category = pageData.category
         window:SetWindowTitle("Challenges - " .. category.name)
         grid:Clear()
-        grid:SetSlot(GUI_NEXT_SLOT, cItem(E_BLOCK_WOOL, 1, E_META_WOOL_LIGHTGREEN, nil, "§a§lNext page"))
-        grid:SetSlot(GUI_PREV_SLOT, cItem(E_BLOCK_WOOL, 1, E_META_WOOL_LIGHTGREEN, nil, "§a§lPrevious page"))
-        for id, challenge in pairs(category.ordered) do
+        grid:SetSlot(GUI_NEXT_SLOT, cItem(E_BLOCK_WOOL, 1, E_META_WOOL_LIGHTBLUE, nil, "§a§lNext page"))
+        grid:SetSlot(GUI_PREV_SLOT, cItem(E_BLOCK_WOOL, 1, E_META_WOOL_LIGHTBLUE, nil, "§a§lPrevious page"))
+        if (true) then
+            local item = cItem(E_BLOCK_WOOL, 1, data.challengeGui.showUsed and E_META_WOOL_LIGHTGREEN or E_META_WOOL_RED)
+            item.m_CustomName = "§9§lDisplay used challenges"
+            item.m_LoreTable = {
+                "Toggles whether or not challenges with no remaining uses will be displayed.",
+                "Current state: " .. (data.challengeGui.showUsed and "§a§lEnabled" or "§c§lDisabled")
+            }
+            grid:SetSlot(GUI_TOGGLE_USED_CHALLENGES, item)
+        end
+        if (true) then
+            local item = cItem(E_BLOCK_WOOL, 1, data.challengeGui.showInaccessible and E_META_WOOL_LIGHTGREEN or E_META_WOOL_RED)
+            item.m_CustomName = "§9§lDisplay inaccessible challenges"
+            item.m_LoreTable = {
+                "Toggles whether or not challenges whose requirements have not yet been satisfied will be displayed.",
+                "Current state: " .. (data.challengeGui.showInaccessible and "§a§lEnabled" or "§c§lDisabled")
+            }
+            grid:SetSlot(GUI_TOGGLE_INACCESSIBLE_CHALLENGES, item)
+        end
+        local slot = 0
+        pageData.challenges = {}
+        for _, challenge in pairs(category.ordered) do
             --LOG("Displaying challenge: " .. challenge.fullId)
             --LOG("id=" .. challenge.display.m_ItemType .. ", count=" .. challenge.display.m_ItemCount)
             local displayItem = cItem(challenge.display)
@@ -224,40 +256,62 @@ function ShowChallengeWindowTo(a_Player)
                 end
             end
             local usable = challenge.usageLimit == -1 or usedCount < challenge.usageLimit
-            if (not dependenciesFufilled) then
-                displayItem.m_ItemType = E_BLOCK_BARRIER
-                displayItem.m_ItemDamage = 0
-            elseif (not usable) then
-                displayItem.m_ItemType = E_BLOCK_IRON_BARS
-                displayItem.m_ItemDamage = 0
+            --LOG("Usable: " .. (usable and "true" or "false") .. ", showUsed: " .. (data.challengeGui.showUsed == nil and "null" or (data.challengeGui.showUsed and "true" or "false")))
+            local display = true
+            if (not usable and not data.challengeGui.showUsed) then
+                display = false
+            elseif (not dependenciesFufilled and not data.challengeGui.showInaccessible) then
+                display = false
             end
-            displayItem.m_CustomName = (dependenciesFufilled and (usable and "§a" or "§7") or "§c") .. "§l" .. challenge.name
-            lore[1] = "§9Remaining uses: " .. (dependenciesFufilled and usable and "§a" or "§7") .. (challenge.usageLimit == -1 and "Unlimited" or (challenge.usageLimit - usedCount) .. "/" .. challenge.usageLimit)
-            lore[2] = "§9Times used: " .. (usedCount > 0 and "§a" or "§7") .. usedCount
-            displayItem.m_LoreTable = lore
-            grid:SetSlot(id - 1, displayItem)
+            if (display) then
+                if (not dependenciesFufilled) then
+                    displayItem.m_ItemType = E_BLOCK_BARRIER
+                    displayItem.m_ItemDamage = 0
+                    displayItem.m_ItemCount = 1
+                elseif (not usable) then
+                    displayItem.m_ItemType = E_BLOCK_IRON_BARS
+                    displayItem.m_ItemDamage = 0
+                    displayItem.m_ItemCount = 1
+                end
+                displayItem.m_CustomName = (dependenciesFufilled and (usable and "§a" or "§7") or "§c") .. "§l" .. challenge.name
+                lore[1] = "§9Remaining uses: " .. (dependenciesFufilled and usable and "§a" or "§7") .. (challenge.usageLimit == -1 and "Unlimited" or (challenge.usageLimit - usedCount) .. "/" .. challenge.usageLimit)
+                lore[2] = "§9Times used: " .. (usedCount > 0 and "§a" or "§7") .. usedCount
+                displayItem.m_LoreTable = lore
+                grid:SetSlot(slot, displayItem)
+                slot = slot + 1
+                pageData.challenges[slot] = challenge
+            end
         end
-        a_Player:OpenWindow(window)
+        if (force) then
+            a_Player:OpenWindow(window)
+        end
     end
     window:SetOnClicked(function(a_Window, a_Player, a_SlotNum, a_ClickAction, a_ClickedItem)
         --LOG(a_SlotNum)
         if (a_SlotNum < 9 * 6) then
             if (a_SlotNum == GUI_NEXT_SLOT) then
                 pageData.page = pageData.page + 1
-                updateWindow()
+                updateWindow(true)
             elseif (a_SlotNum == GUI_PREV_SLOT) then
                 pageData.page = pageData.page - 1
-                updateWindow()
+                updateWindow(true)
+            elseif (a_SlotNum == GUI_TOGGLE_USED_CHALLENGES) then
+                data.challengeGui.showUsed = not data.challengeGui.showUsed
+                updateWindow(false)
+            elseif (a_SlotNum == GUI_TOGGLE_INACCESSIBLE_CHALLENGES) then
+                data.challengeGui.showInaccessible = not data.challengeGui.showInaccessible
+                --LOG("showInaccessible=" .. (data.challengeGui.showInaccessible and "true" or "false"))
+                updateWindow(false)
             elseif (not a_ClickedItem:IsEmpty()) then
                 if (a_ClickedItem.m_ItemType == E_BLOCK_BARRIER and a_ClickedItem.m_ItemDamage == 0) then
                     a_Player:SendMessage("§cComplete all previous challenges first!")
                 elseif (a_ClickedItem.m_ItemType == E_BLOCK_IRON_BARS and a_ClickedItem.m_ItemDamage == 0) then
                     a_Player:SendMessage("§cYou've used this challenge too many times!")
                 else
-                    local category = pageData.category
-                    local challenge = category.ordered[a_SlotNum + 1]
+                    --local category = pageData.category
+                    local challenge = pageData.challenges[a_SlotNum + 1]
                     if (TryCompleteChallenge(a_Player, challenge)) then
-                        updateWindow()
+                        updateWindow(false)
                     end
                 end
             end
@@ -267,7 +321,7 @@ function ShowChallengeWindowTo(a_Player)
             return true
         end
     end)
-    updateWindow()
+    updateWindow(true)
 end
 
 function TryCompleteChallenge(a_Player, challenge)

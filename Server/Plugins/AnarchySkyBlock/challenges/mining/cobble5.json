@@ -16,7 +16,8 @@
     }
   ],
   "display": {
-    "id": "cobblestone"
+    "id": "cobblestone",
+    "count": 5
   },
   "usageLimit": -1
 }

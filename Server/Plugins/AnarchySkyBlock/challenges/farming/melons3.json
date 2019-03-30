@@ -1,0 +1,23 @@
+{
+  "name": "Melons #3",
+  "depends": [
+    "farming.melons2"
+  ],
+  "needs": [
+    {
+      "id": "melonslice",
+      "count": 192
+    }
+  ],
+  "rewards": [
+    {
+      "id": "redstone",
+      "count": 192
+    }
+  ],
+  "display": {
+    "id": "melonslice",
+    "count": 3
+  },
+  "usageLimit": -1
+}

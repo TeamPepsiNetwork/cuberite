@@ -11,7 +11,7 @@ function LoadPlayerdata(a_Player)
     if (data == nil) then
         data = DefaultPlayerdata(a_Player)
     end
-    EnsurePlayerdataContainsAllChallenges(data)
+    EnsurePlayerdataHasAllValues(a_Player, data)
     PLAYER_DATA[uuid] = data
 end
 
@@ -29,9 +29,42 @@ function DefaultPlayerdata(a_Player)
         uuid = a_Player:GetUUID(),
         name = a_Player:GetName(),
         startTime = 0,
+        challengeGui = {
+            showUsed = false,
+            showInaccessible = true
+        },
         challenges = {}
     }
     return data
+end
+
+function EnsurePlayerdataHasAllValues(a_Player, data)
+    local default = DefaultPlayerdata(a_Player)
+    RemoveAllFromOther(data, default)
+    AddAllFromOther(data, default)
+    EnsurePlayerdataContainsAllChallenges(data)
+end
+
+function RemoveAllFromOther(main, other)
+    for key, value in pairs(main) do
+        local otherValue = other[key]
+        if (otherValue ~= nil and type(value) == "table" and type(otherValue) == "table") then
+            RemoveAllFromOther(value, otherValue)
+        else
+            other[key] = nil
+        end
+    end
+end
+
+function AddAllFromOther(main, other)
+    for key, value in pairs(other) do
+        local mainValue = main[key]
+        if (mainValue ~= nil and type(value) == "table" and type(mainValue) == "table") then
+            AddAllFromOther(mainValue, value)
+        else
+            main[key] = value
+        end
+    end
 end
 
 function GetPlayerdata(a_Player)
