@@ -68,9 +68,10 @@ function LoadChallenges()
         local ordered = {}
         local realCounter = 0
         local realOrdered = {}
+        local passNumber = 0
         while (TableLength(challenges) > realCounter) do
             for _, challenge in pairs(challenges) do
-                if (not IsChallengeInList(challenge.fullId, realOrdered) and (challenge.depends == nil or AreAllDependenciesInList(challenge, realOrdered))) then
+                if (not IsChallengeInList(challenge.fullId, realOrdered) and not (passNumber == 0 and challenge.depends ~= nil and #challenge.depends > 0) and (challenge.depends == nil or AreAllDependenciesInList(challenge, realOrdered))) then
                     counter = counter + 1
                     ordered[counter] = challenge
                 end
@@ -81,6 +82,7 @@ function LoadChallenges()
             end
             counter = 0
             ordered = {}
+            passNumber = passNumber + 1
         end
         category.ordered = realOrdered
     end
@@ -229,27 +231,40 @@ function ShowChallengeWindowTo(a_Player)
             local displayItem = cItem(challenge.display)
             local usedCount = data.challenges[challenge.fullId]
             assert(usedCount ~= nil, challenge.fullId)
+
+            local secret = challenge.secret == nil and false or challenge.secret
             local lore = {}
-            lore[3] = "§7Needed:"
-            local i = 4
-            for _, item in pairs(challenge.needs) do
-                lore[i] = "- " .. ItemDisplayName(item) .. " x" .. item.count
-                i = i + 1
+            local loreIndex = secret and 1 or 3
+            if (challenge.info ~= nil) then
+                for _, line in pairs(challenge.info) do
+                    lore[loreIndex] = line
+                    loreIndex = loreIndex + 1
+                end
+                lore[loreIndex] = ""
+                loreIndex = loreIndex + 1
             end
-            lore[i] = "§7Rewards:"
-            i = i + 1
-            for _, item in pairs(challenge.rewards) do
-                lore[i] = "- " .. ItemDisplayName(item) .. " x" .. item.count
-                i = i + 1
+            if (not secret) then
+                lore[loreIndex] = "§7Needed:"
+                loreIndex = loreIndex + 1
+                for _, item in pairs(challenge.needs) do
+                    lore[loreIndex] = "- " .. ItemDisplayName(item) .. " x" .. item.count
+                    loreIndex = loreIndex + 1
+                end
+                lore[loreIndex] = "§7Rewards:"
+                loreIndex = loreIndex + 1
+                for _, item in pairs(challenge.rewards) do
+                    lore[loreIndex] = "- " .. ItemDisplayName(item) .. " x" .. item.count
+                    loreIndex = loreIndex + 1
+                end
             end
             local dependenciesFufilled = true
             if (challenge.depends ~= nil and #challenge.depends > 0) then
-                lore[i] = "§7Requires:"
-                i = i + 1
+                lore[loreIndex] = "§7Requires:"
+                loreIndex = loreIndex + 1
                 for _, challengeId in pairs(challenge.depends) do
                     local fufilled = data.challenges[challengeId] > 0
-                    lore[i] = (fufilled and "§a" or "§c") .. "- " .. INDEXED_CHALLENGES[challengeId].name
-                    i = i + 1
+                    lore[loreIndex] = (fufilled and "§a" or "§c") .. "- " .. INDEXED_CHALLENGES[challengeId].name
+                    loreIndex = loreIndex + 1
                     if (not fufilled) then
                         dependenciesFufilled = false
                     end
@@ -268,14 +283,16 @@ function ShowChallengeWindowTo(a_Player)
                     displayItem.m_ItemType = E_BLOCK_BARRIER
                     displayItem.m_ItemDamage = 0
                     displayItem.m_ItemCount = 1
-                elseif (not usable) then
-                    displayItem.m_ItemType = E_BLOCK_IRON_BARS
-                    displayItem.m_ItemDamage = 0
-                    displayItem.m_ItemCount = 1
+                --elseif (not usable) then
+                --    displayItem.m_ItemType = E_BLOCK_IRON_BARS
+                --    displayItem.m_ItemDamage = 0
+                --    displayItem.m_ItemCount = 1
                 end
                 displayItem.m_CustomName = (dependenciesFufilled and (usable and "§a" or "§7") or "§c") .. "§l" .. challenge.name
-                lore[1] = "§9Remaining uses: " .. (dependenciesFufilled and usable and "§a" or "§7") .. (challenge.usageLimit == -1 and "Unlimited" or (challenge.usageLimit - usedCount) .. "/" .. challenge.usageLimit)
-                lore[2] = "§9Times used: " .. (usedCount > 0 and "§a" or "§7") .. usedCount
+                if (not secret) then
+                    lore[1] = "§9Remaining uses: " .. (dependenciesFufilled and usable and "§a" or "§7") .. (challenge.usageLimit == -1 and "Unlimited" or (challenge.usageLimit - usedCount) .. "/" .. challenge.usageLimit)
+                    lore[2] = "§9Times used: " .. (usedCount > 0 and "§a" or "§7") .. usedCount
+                end
                 displayItem.m_LoreTable = lore
                 grid:SetSlot(slot, displayItem)
                 slot = slot + 1
@@ -305,8 +322,8 @@ function ShowChallengeWindowTo(a_Player)
             elseif (not a_ClickedItem:IsEmpty()) then
                 if (a_ClickedItem.m_ItemType == E_BLOCK_BARRIER and a_ClickedItem.m_ItemDamage == 0) then
                     a_Player:SendMessage("§cComplete all previous challenges first!")
-                elseif (a_ClickedItem.m_ItemType == E_BLOCK_IRON_BARS and a_ClickedItem.m_ItemDamage == 0) then
-                    a_Player:SendMessage("§cYou've used this challenge too many times!")
+                --elseif (a_ClickedItem.m_ItemType == E_BLOCK_IRON_BARS and a_ClickedItem.m_ItemDamage == 0) then
+                --    a_Player:SendMessage("§cYou've used this challenge too many times!")
                 else
                     --local category = pageData.category
                     local challenge = pageData.challenges[a_SlotNum + 1]
@@ -324,7 +341,17 @@ function ShowChallengeWindowTo(a_Player)
     updateWindow(true)
 end
 
-function TryCompleteChallenge(a_Player, challenge)
+function TryCompleteChallenge(a_Player, challenge, silent)
+    local challengesData = GetPlayerdata(a_Player).challenges
+    local usable = challenge.usageLimit == -1 or challengesData[challenge.fullId] < challenge.usageLimit
+    if (not usable) then
+        a_Player:SendMessage("§cYou've used this challenge too many times!")
+        return false
+    end
+    if (challenge.secret and silent == false) then
+        a_Player:SendMessage("§cThis challenge cannot be completed via the menu!")
+        return false
+    end
     local inventory = a_Player:GetInventory()
     for _, item in pairs(challenge.needs) do
         --LOG("Checking for item: " .. item.id .. ":" .. item.meta .. " x" .. item.count)
@@ -332,7 +359,9 @@ function TryCompleteChallenge(a_Player, challenge)
         --LOG("Found " .. count .. " items")
         if (count < item.count) then
             --LOG("Not present!")
-            a_Player:SendMessage("§cMissing items: §l" .. ItemDisplayName(item) .. " x" .. (item.count - count))
+            if (silent == nil and true or silent) then
+                a_Player:SendMessage("§cMissing items: §l" .. ItemDisplayName(item) .. " x" .. (item.count - count))
+            end
             return false
         end
     end
@@ -346,7 +375,6 @@ function TryCompleteChallenge(a_Player, challenge)
             inventory:AddItem(realItem)
         end
     end
-    local challengesData = GetPlayerdata(a_Player).challenges
     challengesData[challenge.fullId] = challengesData[challenge.fullId] + 1
     a_Player:SendMessage("§aCompleted challenge: §l" .. challenge.name .. "§r§a!")
     return true

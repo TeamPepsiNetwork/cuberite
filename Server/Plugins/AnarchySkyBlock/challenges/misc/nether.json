@@ -1,0 +1,18 @@
+{
+  "name": "The Nether",
+  "info": [
+    "§7Make a portal to the Nether and go through it to complete this challenge!"
+  ],
+  "depends": [
+    "mobs.hunter2"
+  ],
+  "needs": [
+  ],
+  "rewards": [
+  ],
+  "display": {
+    "id": "netherrack"
+  },
+  "usageLimit": 1,
+  "secret": true
+}

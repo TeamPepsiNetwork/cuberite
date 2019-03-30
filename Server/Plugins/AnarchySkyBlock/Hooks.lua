@@ -62,3 +62,22 @@ end
 function OnPlayerDestroyed(a_Player)
     SavePlayerdata(a_Player)
 end
+
+function OnEntityChangingWorld(a_Entity, a_World)
+    --LOG("Entity changed world!")
+    if (a_Entity:IsPlayer() and a_World == NETHER) then
+        --LOG("A player changed to the Nether!")
+        local data = GetPlayerdata(a_Entity)
+        if (data.challenges["misc.nether"] == 0) then
+            --LOG("Player has not unlocked the nether challenge yet!")
+            local netherChallenge = INDEXED_CHALLENGES["misc.nether"]
+            for _, challengeId in pairs(netherChallenge.depends) do
+                if (data.challenges[challengeId] == 0) then
+                    --LOG("Player has not completed challenge: " .. challengeId)
+                    return
+                end
+            end
+            TryCompleteChallenge(a_Entity, netherChallenge, true)
+        end
+    end
+end

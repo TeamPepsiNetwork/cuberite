@@ -68,7 +68,11 @@ function AddAllFromOther(main, other)
 end
 
 function GetPlayerdata(a_Player)
-    return PLAYER_DATA[a_Player:GetUUID()]
+    local data = PLAYER_DATA[a_Player:GetUUID()]
+    if (data == nil) then
+        data = LoadPlayerdata(a_Player)
+    end
+    return data
 end
 
 function GetCooldownString(a_Player)

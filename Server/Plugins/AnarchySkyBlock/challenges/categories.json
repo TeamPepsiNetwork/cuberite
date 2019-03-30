@@ -2,10 +2,13 @@
   "names": {
     "arrow": "Arrow",
     "bone": "Bone",
+    "cactus": "Cactus",
     "carrot": "Carrot",
     "cobblestone": "Cobblestone",
     "diamond": "Diamond",
     "dirt": "Dirt",
+    "enderpearl": "Ender Pearl",
+    "endstone": "End Stone",
     "flint": "Flint",
     "gunpowder": "Gunpowder",
     "log": "Oak Wood",
@@ -14,6 +17,7 @@
     "oaklog": "Oak Wood",
     "potato": "Potato",
     "pumpkinseeds": "Pumpkin Seeds",
+    "redstone": "Redstone",
     "rottenflesh": "Rotten Flesh",
     "sand": "Sand",
     "sapling": "Sapling",
@@ -24,6 +28,7 @@
     "sapling:5": "Dark Oak Sapling",
     "stationarylava": "Lava",
     "stone": "Stone",
+    "string": "String",
     "sugarcane": "Sugarcane"
   },
   "categories": [
@@ -75,6 +80,15 @@
         "spider2",
         "zombie1",
         "zombie2"
+      ]
+    },
+    {
+      "name": "Misc.",
+      "id": "misc",
+      "challenges": [
+        "endstone1",
+        "endstone2",
+        "nether"
       ]
     }
   ]

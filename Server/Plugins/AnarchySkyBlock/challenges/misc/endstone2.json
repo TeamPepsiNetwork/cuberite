@@ -1,0 +1,26 @@
+{
+  "name": "End Stone #1",
+  "depends": [
+    "misc.nether"
+  ],
+  "needs": [
+    {
+      "id": "cobblestone",
+      "count": 4
+    },
+    {
+      "id": "enderpearl",
+      "count": 16
+    }
+  ],
+  "rewards": [
+    {
+      "id": "endstone",
+      "count": 4
+    }
+  ],
+  "display": {
+    "id": "endstone"
+  },
+  "usageLimit": 3
+}
