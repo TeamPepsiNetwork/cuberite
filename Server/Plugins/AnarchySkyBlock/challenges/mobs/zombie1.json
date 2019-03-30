@@ -1,0 +1,21 @@
+{
+  "name": "Zombie #1",
+  "depends": [
+    "farming.wood1"
+  ],
+  "needs": [
+    {
+      "id": "rottenflesh",
+      "count": 64
+    }
+  ],
+  "rewards": [
+    {
+      "id": "cactus"
+    }
+  ],
+  "display": {
+    "id": "rottenflesh"
+  },
+  "usageLimit": 3
+}

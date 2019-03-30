@@ -1,0 +1,19 @@
+{
+  "name": "Carrots!",
+  "depends": null,
+  "needs": [
+    {
+      "id": "carrot",
+      "count": 64
+    }
+  ],
+  "rewards": [
+    {
+      "id": "melonseeds"
+    }
+  ],
+  "display": {
+    "id": "carrot"
+  },
+  "usageLimit": -1
+}

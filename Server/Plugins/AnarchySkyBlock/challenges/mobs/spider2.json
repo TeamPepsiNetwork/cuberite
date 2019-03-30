@@ -1,0 +1,22 @@
+{
+  "name": "Spider #2",
+  "depends": [
+    "mobs.spider1"
+  ],
+  "needs": [
+    {
+      "id": "string",
+      "count": 512
+    }
+  ],
+  "rewards": [
+    {
+      "id": "sugarcane",
+      "count": 8
+    }
+  ],
+  "display": {
+    "id": "string"
+  },
+  "usageLimit": -1
+}

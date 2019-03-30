@@ -1,22 +1,22 @@
 {
-  "name": "Wood #3",
+  "name": "Creeper #2",
   "depends": [
-    "wood.wood2"
+    "mobs.creeper1"
   ],
   "needs": [
     {
-      "id": "log",
+      "id": "gunpowder",
       "count": 512
     }
   ],
   "rewards": [
     {
       "id": "sand",
-      "count": 12
+      "count": 8
     }
   ],
   "display": {
-    "id": "log"
+    "id": "gunpowder"
   },
-  "usageLimit": 3
+  "usageLimit": -1
 }

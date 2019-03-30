@@ -1,0 +1,26 @@
+{
+  "name": "Skeleton #2",
+  "depends": [
+    "mobs.skeleton1"
+  ],
+  "needs": [
+    {
+      "id": "bone",
+      "count": 512
+    },
+    {
+      "id": "arrow",
+      "count": 256
+    }
+  ],
+  "rewards": [
+    {
+      "id": "sugarcane",
+      "count": 8
+    }
+  ],
+  "display": {
+    "id": "bone"
+  },
+  "usageLimit": -1
+}

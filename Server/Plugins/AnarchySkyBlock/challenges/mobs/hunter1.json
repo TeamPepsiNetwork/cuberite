@@ -1,0 +1,36 @@
+{
+  "name": "Hunter #1",
+  "depends": [
+    "mobs.creeper2",
+    "mobs.skeleton2",
+    "mobs.spider2",
+    "mobs.zombie2"
+  ],
+  "needs": [
+    {
+      "id": "bone",
+      "count": 128
+    },
+    {
+      "id": "gunpowder",
+      "count": 128
+    },
+    {
+      "id": "rottenflesh",
+      "count": 128
+    },
+    {
+      "id": "string",
+      "count": 128
+    }
+  ],
+  "rewards": [
+    {
+      "id": "flint"
+    }
+  ],
+  "display": {
+    "id": "woodensword"
+  },
+  "usageLimit": 3
+}

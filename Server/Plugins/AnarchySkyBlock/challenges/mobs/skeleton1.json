@@ -1,0 +1,23 @@
+{
+  "name": "Skeleton #1",
+  "depends": null,
+  "needs": [
+    {
+      "id": "bone",
+      "count": 64
+    },
+    {
+      "id": "arrow",
+      "count": 32
+    }
+  ],
+  "rewards": [
+    {
+      "id": "sugarcane"
+    }
+  ],
+  "display": {
+    "id": "bone"
+  },
+  "usageLimit": 3
+}

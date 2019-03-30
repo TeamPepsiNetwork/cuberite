@@ -1,13 +1,46 @@
 {
   "names": {
+    "arrow": "Arrow",
+    "bone": "Bone",
+    "carrot": "Carrot",
     "cobblestone": "Cobblestone",
+    "diamond": "Diamond",
     "dirt": "Dirt",
+    "flint": "Flint",
+    "gunpowder": "Gunpowder",
     "log": "Oak Wood",
+    "melonslice": "Melon Slice",
+    "melonseeds": "Melon Seeds",
     "oaklog": "Oak Wood",
+    "potato": "Potato",
+    "pumpkinseeds": "Pumpkin Seeds",
+    "rottenflesh": "Rotten Flesh",
     "sand": "Sand",
-    "stone": "Stone"
+    "sapling": "Sapling",
+    "sapling:1": "Spruce Saplng",
+    "sapling:2": "Birch Sapling",
+    "sapling:3": "Jungle Sapling",
+    "sapling:4": "Acacia Sapling",
+    "sapling:5": "Dark Oak Sapling",
+    "stationarylava": "Lava",
+    "stone": "Stone",
+    "sugarcane": "Sugarcane"
   },
   "categories": [
+    {
+      "name": "Farming",
+      "id": "farming",
+      "challenges": [
+        "apple1",
+        "carrot1",
+        "potato1",
+        "wood1",
+        "wood2",
+        "wood3",
+        "wood4",
+        "wood5"
+      ]
+    },
     {
       "name": "Mining",
       "id": "mining",
@@ -25,10 +58,20 @@
       ]
     },
     {
-      "name": "Wood",
-      "id": "wood",
+      "name": "Mobs",
+      "id": "mobs",
       "challenges": [
-        "wood1"
+        "creeper1",
+        "creeper2",
+        "hunter1",
+        "hunter2",
+        "hunter3",
+        "skeleton1",
+        "skeleton2",
+        "spider1",
+        "spider2",
+        "zombie1",
+        "zombie2"
       ]
     }
   ]

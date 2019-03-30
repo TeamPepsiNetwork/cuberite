@@ -1,0 +1,22 @@
+{
+  "name": "Zombie #2",
+  "depends": [
+    "mobs.zombie1"
+  ],
+  "needs": [
+    {
+      "id": "rottenflesh",
+      "count": 512
+    }
+  ],
+  "rewards": [
+    {
+      "id": "cactus",
+      "count": 8
+    }
+  ],
+  "display": {
+    "id": "rottenflesh"
+  },
+  "usageLimit": -1
+}

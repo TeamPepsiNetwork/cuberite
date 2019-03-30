@@ -1,0 +1,33 @@
+{
+  "name": "Hunter #2",
+  "depends": [
+    "mobs.hunter1"
+  ],
+  "needs": [
+    {
+      "id": "bone",
+      "count": 256
+    },
+    {
+      "id": "gunpowder",
+      "count": 256
+    },
+    {
+      "id": "rottenflesh",
+      "count": 256
+    },
+    {
+      "id": "string",
+      "count": 256
+    }
+  ],
+  "rewards": [
+    {
+      "id": "stationarylava"
+    }
+  ],
+  "display": {
+    "id": "ironsword"
+  },
+  "usageLimit": -1
+}

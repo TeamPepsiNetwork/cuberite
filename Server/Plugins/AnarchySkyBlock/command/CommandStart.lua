@@ -58,10 +58,11 @@ function CommandStart(a_Split, a_Player)
         a_Player:SendMessage("§9Are you sure you want to restart?")
         a_Player:SendMessage("§9Type §l/start confirm§r§9 to confirm.")
     else
+        data.startTime = age
+        data.challenges = {}
+        EnsurePlayerdataContainsAllChallenges(data)
         a_Player:GetWorld():SpawnItemPickups(STARTER_ITEMS, a_Player:GetPosX(), a_Player:GetPosY(), a_Player:GetPosZ(), 0, false)
         a_Player:SendMessage("§aWelcome to AnarchySkyBlock!")
-        -- TODO: reset challenges
-        data.startTime = age
     end
     return true
 end

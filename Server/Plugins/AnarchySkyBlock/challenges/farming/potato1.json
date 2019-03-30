@@ -1,0 +1,19 @@
+{
+  "name": "Potatoes!",
+  "depends": null,
+  "needs": [
+    {
+      "id": "potato",
+      "count": 64
+    }
+  ],
+  "rewards": [
+    {
+      "id": "pumpkinseeds"
+    }
+  ],
+  "display": {
+    "id": "potato"
+  },
+  "usageLimit": -1
+}

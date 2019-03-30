@@ -1,0 +1,19 @@
+{
+  "name": "Spider #1",
+  "depends": null,
+  "needs": [
+    {
+      "id": "string",
+      "count": 64
+    }
+  ],
+  "rewards": [
+    {
+      "id": "sugarcane"
+    }
+  ],
+  "display": {
+    "id": "string"
+  },
+  "usageLimit": 3
+}

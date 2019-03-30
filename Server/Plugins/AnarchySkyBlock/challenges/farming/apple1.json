@@ -1,0 +1,38 @@
+{
+  "name": "Apples!",
+  "depends": [
+    "farming.wood2"
+  ],
+  "needs": [
+    {
+      "id": "apple",
+      "count": 64
+    }
+  ],
+  "rewards": [
+    {
+      "id": "sapling",
+      "meta": 1
+    },
+    {
+      "id": "sapling",
+      "meta": 2
+    },
+    {
+      "id": "sapling",
+      "meta": 3
+    },
+    {
+      "id": "sapling",
+      "meta": 4
+    },
+    {
+      "id": "sapling",
+      "meta": 5
+    }
+  ],
+  "display": {
+    "id": "apple"
+  },
+  "usageLimit": -1
+}

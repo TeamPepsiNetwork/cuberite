@@ -37,6 +37,7 @@ function LoadChallenges()
         for id, challenge in pairs(category.challenges) do
             local fullId = category.id .. "." .. id
             INDEXED_CHALLENGES[fullId] = challenge
+            challenge.categoryId = category.id
             challenge.fullId = fullId
         end
     end
@@ -63,21 +64,29 @@ function LoadChallenges()
         end
         local counter = 0
         local ordered = {}
-        while (TableLength(challenges) > counter) do
+        local realCounter = 0
+        local realOrdered = {}
+        while (TableLength(challenges) > realCounter) do
             for _, challenge in pairs(challenges) do
-                if (not IsChallengeInList(challenge.fullId, ordered) and (challenge.depends == nil or AreAllDependenciesInList(challenge, ordered))) then
+                if (not IsChallengeInList(challenge.fullId, realOrdered) and (challenge.depends == nil or AreAllDependenciesInList(challenge, realOrdered))) then
                     counter = counter + 1
                     ordered[counter] = challenge
                 end
             end
+            for _, challenge in pairs(ordered) do
+                realCounter = realCounter + 1
+                realOrdered[realCounter] = challenge
+            end
+            counter = 0
+            ordered = {}
         end
-        category.ordered = ordered
+        category.ordered = realOrdered
     end
 end
 
 function AreAllDependenciesInList(challenge, list)
     for _, dep in pairs(challenge.depends) do
-        if (not IsChallengeInList(dep, list)) then
+        if (string.find(dep, challenge.categoryId) ~= nil and not IsChallengeInList(dep, list)) then
             --LOG("Dependency " .. dep .. " not found.")
             return false
         end
@@ -216,15 +225,15 @@ function ShowChallengeWindowTo(a_Player)
             end
             local usable = challenge.usageLimit == -1 or usedCount < challenge.usageLimit
             if (not dependenciesFufilled) then
-                displayItem.m_ItemType = E_BLOCK_WOOL
-                displayItem.m_ItemDamage = E_META_WOOL_RED
+                displayItem.m_ItemType = E_BLOCK_BARRIER
+                displayItem.m_ItemDamage = 0
             elseif (not usable) then
                 displayItem.m_ItemType = E_BLOCK_IRON_BARS
                 displayItem.m_ItemDamage = 0
             end
             displayItem.m_CustomName = (dependenciesFufilled and (usable and "§a" or "§7") or "§c") .. "§l" .. challenge.name
             lore[1] = "§9Remaining uses: " .. (dependenciesFufilled and usable and "§a" or "§7") .. (challenge.usageLimit == -1 and "Unlimited" or (challenge.usageLimit - usedCount) .. "/" .. challenge.usageLimit)
-            lore[2] = "§9Times used:     " .. (usedCount > 0 and "§a" or "§7") .. usedCount
+            lore[2] = "§9Times used: " .. (usedCount > 0 and "§a" or "§7") .. usedCount
             displayItem.m_LoreTable = lore
             grid:SetSlot(id - 1, displayItem)
         end
@@ -240,7 +249,7 @@ function ShowChallengeWindowTo(a_Player)
                 pageData.page = pageData.page - 1
                 updateWindow()
             elseif (not a_ClickedItem:IsEmpty()) then
-                if (a_ClickedItem.m_ItemType == E_BLOCK_WOOL and a_ClickedItem.m_ItemDamage == E_META_WOOL_RED) then
+                if (a_ClickedItem.m_ItemType == E_BLOCK_BARRIER and a_ClickedItem.m_ItemDamage == 0) then
                     a_Player:SendMessage("§cComplete all previous challenges first!")
                 elseif (a_ClickedItem.m_ItemType == E_BLOCK_IRON_BARS and a_ClickedItem.m_ItemDamage == 0) then
                     a_Player:SendMessage("§cYou've used this challenge too many times!")

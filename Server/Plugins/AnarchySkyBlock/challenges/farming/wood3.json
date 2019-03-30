@@ -1,22 +1,22 @@
 {
-  "name": "Wood #5",
+  "name": "Wood #3",
   "depends": [
-    "wood.wood4"
+    "farming.wood2"
   ],
   "needs": [
     {
       "id": "log",
-      "count": 2048
+      "count": 512
     }
   ],
   "rewards": [
     {
       "id": "sand",
-      "count": 64
+      "count": 12
     }
   ],
   "display": {
     "id": "log"
   },
-  "usageLimit": -1
+  "usageLimit": 3
 }

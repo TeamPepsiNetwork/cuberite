@@ -1,0 +1,19 @@
+{
+  "name": "Creeper #1",
+  "depends": null,
+  "needs": [
+    {
+      "id": "gunpowder",
+      "count": 64
+    }
+  ],
+  "rewards": [
+    {
+      "id": "sand"
+    }
+  ],
+  "display": {
+    "id": "gunpowder"
+  },
+  "usageLimit": 3
+}
