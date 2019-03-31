@@ -11,7 +11,8 @@ function InitNoise()
         assert(#NOISE_CACHE == 256, "Noise cache must contain exactly 256 values, but we found " .. #NOISE_CACHE .. "!")
     else
         LOG("Generating random noise...")
-        for i = 1, 512 do -- warm up RNG
+        for i = 1, 512 do
+            -- warm up RNG
             math.random()
         end
         NOISE_CACHE = {}
@@ -30,10 +31,10 @@ function GenerateChunk(chunkX, chunkZ, primer)
         for z = 0, 15 do
             local xx = chunkX * 16 + x
             local zz = chunkZ * 16 + z
-            local height = math.floor(GetOctaveNoise2d(xx, zz, 2, 0.002) * 100 / 256)
             for y = 0, 80 do
                 primer:SetBlockType(x, y, z, E_BLOCK_DIRT)
             end
+            local height = math.floor(GetBaseNoise2d(xx * 0.002, zz * 0.002) * 250 / 256)
             for y = 80, height + 80 do
                 if (GetOctaveNoise3d(chunkX * 16 + x, y, chunkZ * 16 + z, 3, 0.025) - ((y - 80) / height) * 256 > 0.0) then
                     primer:SetBlockType(x, y, z, E_BLOCK_DIRT)
@@ -46,14 +47,35 @@ function GenerateChunk(chunkX, chunkZ, primer)
         for z = 0, 15 do
             --primer:SetBlockType(x, primer:GetHeight(x, z), z, E_BLOCK_GRASS)
             primer:SetBiome(x, z, biForestHills)
-            local prev = E_BLOCK_DIRT
+            local prev = E_BLOCK_AIR
             local height = primer:GetHeight(x, z) + 2
-            for y = 80, height do
-                local block = primer:GetBlockType(x, y, z)
-                if (block == E_BLOCK_AIR and prev == E_BLOCK_DIRT) then
-                    primer:SetBlockType(x, y - 1, z, E_BLOCK_GRASS)
+            if (false) then
+                for y = 80, height do
+                    local block = primer:GetBlockType(x, y, z)
+                    if (block == E_BLOCK_AIR and prev == E_BLOCK_DIRT) then
+                        primer:SetBlockType(x, y - 1, z, E_BLOCK_GRASS)
+                    end
+                    prev = block
                 end
-                prev = block
+            else
+                local dirtCount = 0
+                while (height > 0) do
+                    local block = primer:GetBlockType(x, height, z)
+                    if (block == E_BLOCK_DIRT) then
+                        dirtCount = dirtCount + 1
+                        if (dirtCount > 5) then
+                            primer:SetBlockType(x, height, z, E_BLOCK_STONE)
+                            block = E_BLOCK_STONE
+                        elseif (prev == E_BLOCK_AIR) then
+                            primer:SetBlockType(x, height, z, E_BLOCK_GRASS)
+                            block = E_BLOCK_GRASS
+                        end
+                    else
+                        dirtCount = 0
+                    end
+                    prev = block
+                    height = height - 1
+                end
             end
         end
     end
@@ -64,11 +86,11 @@ function GetOctaveNoise3d(x, y, z, octaves, scale)
     local mult = scale == nil and 1.0 or scale
     local fact = 1.0
     for o = 1, octaves do
-        val = val + GetBaseNoise3d(x * mult, y * mult, z * mult) * fact
+        val = val + (GetBaseNoise3d(x * mult, y * mult, z * mult) - 128) * fact
         mult = mult * 2.0
-        fact = fact / 2.0
+        fact = fact * 0.5
     end
-    return val
+    return val + 128
 end
 
 function GetOctaveNoise2d(x, y, octaves, scale)
@@ -76,11 +98,11 @@ function GetOctaveNoise2d(x, y, octaves, scale)
     local mult = scale == nil and 1.0 or scale
     local fact = 1.0
     for o = 1, octaves do
-        val = val + GetBaseNoise2d(x * mult, y * mult) * fact
+        val = val + (GetBaseNoise2d(x * mult, y * mult) - 128) * fact
         mult = mult * 2.0
         fact = fact / 2.0
     end
-    return val
+    return val + 128
 end
 
 function GetOctaveNoise1d(x, octaves, scale)
@@ -88,11 +110,11 @@ function GetOctaveNoise1d(x, octaves, scale)
     local mult = scale == nil and 1.0 or scale
     local fact = 1.0
     for o = 1, octaves do
-        val = val + GetBaseNoise1d(x * mult) * fact
+        val = val + (GetBaseNoise1d(x * mult) - 128) * fact
         mult = mult * 2.0
         fact = fact / 2.0
     end
-    return val
+    return val + 128
 end
 
 function GetBaseNoise3d(x, y, z)
@@ -147,7 +169,6 @@ end
 function Fade(t)
     return t * t * t * (t * (t * 6 - 15) + 10)
 end
-
 
 function Lerp(v1, v2, t)
     return v1 + t * (v2 - v1)
