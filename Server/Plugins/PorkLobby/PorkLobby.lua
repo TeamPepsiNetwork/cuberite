@@ -1,15 +1,18 @@
--- A simple plugin with some various utilities for helping with running the server
+-- Lobby plugin for the Team Pepsi server network
+-- as usual, by DaPorkchop_
+-- yeet
 
-NAME = "PepsiUtils"
+NAME = "PorkLobby"
 VERSION_NUMBER = 1
 VERSION = "v0.0.1-SNAPSHOT"
 
-PLUGIN = nil
-LOCAL_FOLDER = nil
-CONFIG_FILE = nil
+PLUGIN = nil       -- plugin instance
+LOCAL_FOLDER = nil -- plugin folder
+CONFIG_FILE = nil  -- config file path
 
-DISABLE_JOIN_MESSAGE = true
-USE_CHAT_PREFIXES = false
+WORLD_NAME = nil   -- name of the lobby world
+
+WORLD = nil        -- default world instance
 
 function Initialize(Plugin)
     LOG("Loading " .. NAME .. " " .. VERSION .. " (version id " .. VERSION_NUMBER .. ")")
@@ -24,16 +27,19 @@ function Initialize(Plugin)
     LoadLuaFiles() -- load all
     LoadConfiguration()
 
-    -- Register hooks
-    cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED, OnPlayerJoined)
-    cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_DESTROYED, OnPlayerDestroyed)
-    cPluginManager:AddHook(cPluginManager.HOOK_WORLD_STARTED, OnWorldStarted)
+    InitNoise()
 
-    --cPluginManager:AddHook(cPluginManager.HOOK_ENTITY_CHANGING_WORLD, OnEntityChangingWorld)
-    --cPluginManager:AddHook(cPluginManager.HOOK_ENTITY_CHANGED_WORLD, OnEntityChangedWorld)
-    --cPluginManager:AddHook(cPluginManager.HOOK_WORLD_TICK, OnWorldTick)
-    --cPluginManager:AddHook(cPluginManager.HOOK_ENTITY_TELEPORT, OnEntityTeleport)
-    --cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
+    WORLD = cRoot:Get():GetWorld(WORLD_NAME)
+    if (WORLD == nil) then
+        LOGERROR(PLUGIN:GetName() .. " requires the world \"" .. WORLD_NAME .. "\", but it was not found!")
+        LOGERROR("Create the world or edit the world name \"Config.ini\".")
+        return false
+    end
+
+    -- Register hooks
+    cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATING, OnChunkGenerating)
+    cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED, TeleportPlayerToSpawn)
+    -- TODO: warp portals, and store them on disk somewhere
 
     LOG(NAME .. " " .. VERSION .. " loaded successfully!")
     return true
@@ -54,12 +60,10 @@ function LoadConfiguration()
     configIni:AddHeaderComment(" Made by DaPorkchop_ for the Team Pepsi Server Network")
     configIni:AddHeaderComment(" https://daporkchop.net")
     configIni:AddHeaderComment(" https://pepsi.team")
-    configIni:AddKeyComment("General", " \"Disable_join_message\" controls whether or not to broadcast player join/leave messages")
-    configIni:AddKeyComment("General", " \"Use_chat_prefixes\" controls whether or not to prefix chat messages (e.g. [INFO])")
+    configIni:AddKeyComment("Worlds", " \"World_name\" is the name of the world that will be used as the lobby world")
 
     -- read values from config
-    DISABLE_JOIN_MESSAGE = configIni:GetValueSetB("General", "Disable_join_message", true)
-    USE_CHAT_PREFIXES = configIni:GetValueSetB("General", "Use_chat_prefixes", false)
+    WORLD_NAME = configIni:GetValueSet("Worlds", "World_name", "world")
 
     -- sanity check values
 
@@ -69,7 +73,10 @@ end
 
 function LoadLuaFiles()
     local files = {
-        "/Hooks.lua"
+        "/Hooks.lua",
+        "/PorkianNoise.lua",
+        -- libraries
+        "/../lib/luabit/bit.lua"
     }
 
     for _, file in pairs(files) do
