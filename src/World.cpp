@@ -625,7 +625,7 @@ void cWorld::InitializeSpawn(void)
 	#if defined(_DEBUG) || defined(ANDROID)
 		const int DefaultViewDist = 9;
 	#else
-		const int DefaultViewDist = 20;  // Always prepare an area 20 chunks across, no matter what the actual cClientHandle::VIEWDISTANCE is
+		const int DefaultViewDist = 10;  // Always prepare an area 20 chunks across, no matter what the actual cClientHandle::VIEWDISTANCE is
 	#endif  // _DEBUG
 
 	if (!m_IsSpawnExplicitlySet)

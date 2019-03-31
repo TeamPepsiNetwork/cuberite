@@ -51,7 +51,7 @@ public:  // tolua_export
 	#if defined(ANDROID)
 		static const int DEFAULT_VIEW_DISTANCE = 4;  // The default ViewDistance (used when no value is set in Settings.ini)
 	#else
-		static const int DEFAULT_VIEW_DISTANCE = 10;
+		static const int DEFAULT_VIEW_DISTANCE = 8;
 	#endif
 	static const int MAX_VIEW_DISTANCE = 32;
 	static const int MIN_VIEW_DISTANCE = 1;
