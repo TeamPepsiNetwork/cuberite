@@ -13,6 +13,7 @@ function LoadPlayerdata(a_Player)
     end
     EnsurePlayerdataHasAllValues(a_Player, data)
     PLAYER_DATA[uuid] = data
+    return data
 end
 
 function SavePlayerdata(a_Player)
