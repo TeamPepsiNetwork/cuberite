@@ -65,8 +65,6 @@ function Initialize(Plugin)
     cPluginManager:BindCommand("/challenge", "core.build", CommandChallenge, " - View SkyBlock challenges")
     cPluginManager:BindCommand("/start", "core.build", CommandStart, " - Get starter items for SkyBlock")
 
-    cPluginManager:BindCommand("/itemtest", "core.build", CommandItemTest, " - Debug: serialize held item to string")
-
     LOG(NAME .. " " .. VERSION .. " loaded successfully!")
 
     math.randomseed(os.time())
@@ -126,7 +124,6 @@ function LoadLuaFiles()
         "/Playerdata.lua",
         -- commands
         "/command/CommandChallenge.lua",
-        "/command/CommandItemTest.lua",
         "/command/CommandStart.lua"
     }
 
