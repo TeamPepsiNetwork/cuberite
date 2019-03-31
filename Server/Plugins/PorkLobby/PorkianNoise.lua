@@ -16,7 +16,7 @@ function InitNoise()
         end
         NOISE_CACHE = {}
         for i = 1, 256 do
-            NOISE_CACHE[i] = math.random(-256, 256)
+            NOISE_CACHE[i] = math.random(0, 256)
         end
         local file = io.open(path, "w+")
         file:write(cJson:Serialize(NOISE_CACHE))
@@ -25,11 +25,45 @@ function InitNoise()
     end
 end
 
-function GetOctaveNoise3d(x, y, z, octaves)
+function GenerateChunk(chunkX, chunkZ, primer)
+    for x = 0, 15 do
+        for z = 0, 15 do
+            local xx = chunkX * 16 + x
+            local zz = chunkZ * 16 + z
+            local height = math.floor(GetOctaveNoise2d(xx, zz, 2, 0.002) * 100 / 256)
+            for y = 0, 80 do
+                primer:SetBlockType(x, y, z, E_BLOCK_DIRT)
+            end
+            for y = 80, height + 80 do
+                if (GetOctaveNoise3d(chunkX * 16 + x, y, chunkZ * 16 + z, 3, 0.025) - ((y - 80) / height) * 256 > 0.0) then
+                    primer:SetBlockType(x, y, z, E_BLOCK_DIRT)
+                end
+            end
+        end
+    end
+    primer:UpdateHeightmap()
+    for x = 0, 15 do
+        for z = 0, 15 do
+            --primer:SetBlockType(x, primer:GetHeight(x, z), z, E_BLOCK_GRASS)
+            primer:SetBiome(x, z, biForestHills)
+            local prev = E_BLOCK_DIRT
+            local height = primer:GetHeight(x, z) + 2
+            for y = 80, height do
+                local block = primer:GetBlockType(x, y, z)
+                if (block == E_BLOCK_AIR and prev == E_BLOCK_DIRT) then
+                    primer:SetBlockType(x, y - 1, z, E_BLOCK_GRASS)
+                end
+                prev = block
+            end
+        end
+    end
+end
+
+function GetOctaveNoise3d(x, y, z, octaves, scale)
     local val = 0.0
-    local mult = 1.0
+    local mult = scale == nil and 1.0 or scale
     local fact = 1.0
-    for o in 1, octaves do
+    for o = 1, octaves do
         val = val + GetBaseNoise3d(x * mult, y * mult, z * mult) * fact
         mult = mult * 2.0
         fact = fact / 2.0
@@ -37,11 +71,11 @@ function GetOctaveNoise3d(x, y, z, octaves)
     return val
 end
 
-function GetOctaveNoise2d(x, y, octaves)
+function GetOctaveNoise2d(x, y, octaves, scale)
     local val = 0.0
-    local mult = 1.0
+    local mult = scale == nil and 1.0 or scale
     local fact = 1.0
-    for o in 1, octaves do
+    for o = 1, octaves do
         val = val + GetBaseNoise2d(x * mult, y * mult) * fact
         mult = mult * 2.0
         fact = fact / 2.0
@@ -49,11 +83,11 @@ function GetOctaveNoise2d(x, y, octaves)
     return val
 end
 
-function GetOctaveNoise1d(x, octaves)
+function GetOctaveNoise1d(x, octaves, scale)
     local val = 0.0
-    local mult = 1.0
+    local mult = scale == nil and 1.0 or scale
     local fact = 1.0
-    for o in 1, octaves do
+    for o = 1, octaves do
         val = val + GetBaseNoise1d(x * mult) * fact
         mult = mult * 2.0
         fact = fact / 2.0
@@ -99,11 +133,11 @@ function GetBaseNoise1d(x)
 end
 
 function Hash3d(x, y, z)
-    return bit.bxor(bit.bxor(NOISE_CACHE[x * 2047 % 256 + 1], NOISE_CACHE[y * 8191 % 256 + 1]), NOISE_CACHE[z * 131071 % 256 + 1])
+    return NOISE_CACHE[(NOISE_CACHE[(NOISE_CACHE[x * 2047 % 256 + 1] + y * 8191) % 256 + 1] + z * 131071) % 256 + 1]
 end
 
 function Hash2d(x, y)
-    return bit.bxor(NOISE_CACHE[x * 2047 % 256 + 1], NOISE_CACHE[y * 8191 % 256 + 1])
+    return NOISE_CACHE[(NOISE_CACHE[x * 2047 % 256 + 1] + y * 8191) % 256 + 1]
 end
 
 function Hash1d(x)
