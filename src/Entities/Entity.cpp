@@ -1524,6 +1524,9 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 	UNUSED(a_ShouldSendRespawn);
 	ASSERT(a_World != nullptr);
 
+    // Prevent the entity from teleporting back immediately, in case the destination is a portal
+    m_PortalCooldownData.m_ShouldPreventTeleportation = true;
+
 	if (GetWorld() == a_World)
 	{
 		// Don't move to same world
@@ -1563,11 +1566,12 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 	SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
 	OldWorld->QueueTask([this, OldChunkCoords, a_World](cWorld & a_OldWorld)
 	{
-		LOGD("Warping entity #%i (%s) from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
+		LOG("Warping entity #%i (%s) from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
 			this->GetUniqueID(), this->GetClass(),
 			a_OldWorld.GetName().c_str(), a_World->GetName().c_str(),
 			OldChunkCoords.m_ChunkX, OldChunkCoords.m_ChunkZ
 		);
+        LOG("We got here!");
 		UNUSED(OldChunkCoords);  // Non Debug mode only
 		a_World->AddEntity(a_OldWorld.RemoveEntity(*this));
 		cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, a_OldWorld);

@@ -27,7 +27,13 @@ function Initialize(Plugin)
     -- Register hooks
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED, OnPlayerJoined)
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_DESTROYED, OnPlayerDestroyed)
-    cPluginManager:AddHook(cPluginManager.HOOK_WORLD_STARTED, OnWorldStarted);
+    cPluginManager:AddHook(cPluginManager.HOOK_WORLD_STARTED, OnWorldStarted)
+
+    --cPluginManager:AddHook(cPluginManager.HOOK_ENTITY_CHANGING_WORLD, OnEntityChangingWorld)
+    --cPluginManager:AddHook(cPluginManager.HOOK_ENTITY_CHANGED_WORLD, OnEntityChangedWorld)
+    --cPluginManager:AddHook(cPluginManager.HOOK_WORLD_TICK, OnWorldTick)
+    --cPluginManager:AddHook(cPluginManager.HOOK_ENTITY_TELEPORT, OnEntityTeleport)
+    --cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
 
     LOG(NAME .. " " .. VERSION .. " loaded successfully!")
     return true
