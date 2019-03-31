@@ -7,6 +7,11 @@ function OnChunkGenerating(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc)
         end
     elseif (a_World:GetName() == NETHER_NAME) then
         FillBlocks(a_ChunkDesc)
+        for x = 0, 15 do
+            for z = 0, 15 do
+                a_ChunkDesc:SetBiome(x, z, biHell)
+            end
+        end
     end
 end
 
