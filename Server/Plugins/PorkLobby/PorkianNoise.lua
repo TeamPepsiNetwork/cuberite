@@ -34,7 +34,7 @@ function GenerateChunk(chunkX, chunkZ, primer)
             for y = 0, 80 do
                 primer:SetBlockType(x, y, z, E_BLOCK_DIRT)
             end
-            local height = math.floor(GetBaseNoise2d(xx * 0.002, zz * 0.002) * 250 / 256)
+            local height = math.min(math.floor(GetBaseNoise2d(xx * 0.002, zz * 0.002) * 250 / 256), 250)
             for y = 80, height + 80 do
                 if (GetOctaveNoise3d(chunkX * 16 + x, y, chunkZ * 16 + z, 3, 0.025) - ((y - 80) / height) * 256 > 0.0) then
                     primer:SetBlockType(x, y, z, E_BLOCK_DIRT)
