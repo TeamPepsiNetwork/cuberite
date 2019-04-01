@@ -28,6 +28,7 @@ function Initialize(Plugin)
     LoadConfiguration()
 
     InitNoise()
+    LoadPortals()
 
     WORLD = cRoot:Get():GetWorld(WORLD_NAME)
     if (WORLD == nil) then
@@ -75,8 +76,10 @@ function LoadLuaFiles()
     local files = {
         "/Hooks.lua",
         "/PorkianNoise.lua",
+        "/Portals.lua",
         -- libraries
-        "/../lib/luabit/bit.lua"
+        --"/../lib/luabit/bit.lua",
+        "/../lib/porklib.lua"
     }
 
     for _, file in pairs(files) do
