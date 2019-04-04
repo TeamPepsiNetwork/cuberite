@@ -6,7 +6,7 @@
 --This is never nessecary (if you send as long, any value will work), but it is nice.
 --PMLib.FindLen is an INCREDIBLY useful function. It finds the length of the next section of the message. Do note that every read function does this already (or knows the length ahead of time), so FindLen is mostly for your own use if you choose to parse manually.
 
-local PMLib = {}
+PMLib = {}
 
 function PMLib.FindLen(a_str)
     return string.byte(a_str,1) * 256 + string.byte(a_str,2), a_str:sub(3)

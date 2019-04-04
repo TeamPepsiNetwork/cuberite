@@ -1566,12 +1566,12 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 	SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
 	OldWorld->QueueTask([this, OldChunkCoords, a_World](cWorld & a_OldWorld)
 	{
-		LOG("Warping entity #%i (%s) from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
+		LOGD("Warping entity #%i (%s) from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
 			this->GetUniqueID(), this->GetClass(),
 			a_OldWorld.GetName().c_str(), a_World->GetName().c_str(),
 			OldChunkCoords.m_ChunkX, OldChunkCoords.m_ChunkZ
 		);
-        LOG("We got here!");
+        //LOG("We got here!");
 		UNUSED(OldChunkCoords);  // Non Debug mode only
 		a_World->AddEntity(a_OldWorld.RemoveEntity(*this));
 		cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, a_OldWorld);

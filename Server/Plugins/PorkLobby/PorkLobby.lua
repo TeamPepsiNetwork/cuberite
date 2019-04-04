@@ -40,7 +40,13 @@ function Initialize(Plugin)
     -- Register hooks
     cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATING, OnChunkGenerating)
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED, TeleportPlayerToSpawn)
-    -- TODO: warp portals, and store them on disk somewhere
+    cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
+    --cPluginManager:AddHook(cPluginManager.HOOK_ENTITY_CHANGING_WORLD, OnEntityChangingWorld);
+    cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_BREAKING_BLOCK, OnPlayerBreakingBlock);
+
+    -- Command Bindings
+    cPluginManager:BindCommand("/addportal", "core.ban", CommandAddPortal, "Creates a cross-server portal")
+    cPluginManager:BindCommand("/delportal", "core.ban", CommandDelPortal, "Deletes a cross-server portal")
 
     LOG(NAME .. " " .. VERSION .. " loaded successfully!")
     return true
@@ -57,6 +63,7 @@ function LoadConfiguration()
 
     -- set up comments
     configIni:DeleteHeaderComments()
+    configIni:DeleteKeyComments("Worlds")
     configIni:AddHeaderComment(" Configuration file for " .. NAME)
     configIni:AddHeaderComment(" Made by DaPorkchop_ for the Team Pepsi Server Network")
     configIni:AddHeaderComment(" https://daporkchop.net")
