@@ -69,8 +69,8 @@ function Initialize(Plugin)
     cPluginManager:AddHook(cPluginManager.HOOK_ENTITY_CHANGING_WORLD, OnEntityChangingWorld);
 
     -- Command Bindings
-    cPluginManager:BindCommand("/challenge", "core.build", CommandChallenge, " - View " .. INSTANCE_NAME .. " challenges")
-    cPluginManager:BindCommand("/start", "core.build", CommandStart, " - Get starter items for " .. INSTANCE_NAME)
+    cPluginManager:BindCommand("/challenge", "core.help", CommandChallenge, " - View " .. INSTANCE_NAME .. " challenges")
+    cPluginManager:BindCommand("/start", "core.help", CommandStart, " - Get starter items for " .. INSTANCE_NAME)
 
     LOG(NAME .. " " .. VERSION .. " loaded successfully!")
 

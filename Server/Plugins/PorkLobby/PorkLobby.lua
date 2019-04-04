@@ -45,8 +45,8 @@ function Initialize(Plugin)
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_BREAKING_BLOCK, OnPlayerBreakingBlock);
 
     -- Command Bindings
-    cPluginManager:BindCommand("/addportal", "core.ban", CommandAddPortal, "Creates a cross-server portal")
-    cPluginManager:BindCommand("/delportal", "core.ban", CommandDelPortal, "Deletes a cross-server portal")
+    cPluginManager:BindCommand("/addportal", "core.ban", CommandAddPortal, " - Creates a cross-server portal")
+    cPluginManager:BindCommand("/delportal", "core.ban", CommandDelPortal, " - Deletes a cross-server portal")
 
     LOG(NAME .. " " .. VERSION .. " loaded successfully!")
     return true
@@ -85,7 +85,6 @@ function LoadLuaFiles()
         "/PorkianNoise.lua",
         "/Portals.lua",
         -- libraries
-        --"/../lib/luabit/bit.lua",
         "/../lib/porklib.lua"
     }
 

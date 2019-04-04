@@ -17,7 +17,7 @@ function ConsiderTeleportPlayer(a_Player, a_NewPos)
     local playerBB = cBoundingBox(a_NewPos, 0.3, 1.8)
     for id, bb in pairs(PORTALS) do
         if (bb:DoesIntersect(playerBB)) then
-            LOG("Sending player to " .. id .. "...")
+            --LOG("Sending player to " .. id .. "...")
             BungeeTransferPlayer(a_Player, id)
             TeleportPlayerToSpawn(a_Player)
             return true
