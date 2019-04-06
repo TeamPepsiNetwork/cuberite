@@ -47,7 +47,6 @@ function Initialize(Plugin)
     cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATING, OnChunkGenerating)
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED, TeleportPlayerToSpawn)
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
-    --cPluginManager:AddHook(cPluginManager.HOOK_ENTITY_CHANGING_WORLD, OnEntityChangingWorld);
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_BREAKING_BLOCK, OnPlayerBreakingBlock);
 
     -- Command Bindings
@@ -88,11 +87,11 @@ function LoadConfiguration()
     -- read values from config
     WORLD_NAME = configIni:GetValueSet("Worlds", "World_name", "world")
 
-    SPAWN_MIN_X = configIni:GetValueSetI("Spawn", "MinX", 16)
+    SPAWN_MIN_X = configIni:GetValueSetI("Spawn", "MinX", -16)
     SPAWN_MAX_X = configIni:GetValueSetI("Spawn", "MaxX", 16)
     SPAWN_MIN_Y = configIni:GetValueSetI("Spawn", "MinY", 0)
     SPAWN_MAX_Y = configIni:GetValueSetI("Spawn", "MaxY", 256)
-    SPAWN_MIN_Z = configIni:GetValueSetI("Spawn", "MinZ", 16)
+    SPAWN_MIN_Z = configIni:GetValueSetI("Spawn", "MinZ", -16)
     SPAWN_MAX_Z = configIni:GetValueSetI("Spawn", "MaxZ", 16)
 
     -- sanity check values
