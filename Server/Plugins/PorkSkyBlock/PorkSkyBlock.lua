@@ -76,8 +76,8 @@ function Initialize(Plugin)
     cPluginManager:AddHook(cPluginManager.HOOK_WORLD_TICK, OnWorldTick)
 
     -- Command Bindings
-    cPluginManager:BindCommand("/challenge", "core.help", CommandChallenge, " - View " .. INSTANCE_NAME .. " challenges")
-    cPluginManager:BindCommand("/start", "core.help", CommandStart, " - Get starter items for " .. INSTANCE_NAME)
+    cPluginManager:BindCommand("/challenge", "core.help", CommandChallenge, "§6 - View " .. INSTANCE_NAME .. " challenges")
+    cPluginManager:BindCommand("/start", "core.help", CommandStart, "§6 - Get starter items for " .. INSTANCE_NAME)
 
     LOG(NAME .. " " .. VERSION .. " loaded successfully!")
 

@@ -51,8 +51,8 @@ function Initialize(Plugin)
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_BREAKING_BLOCK, OnPlayerBreakingBlock);
 
     -- Command Bindings
-    cPluginManager:BindCommand("/addportal", "core.ban", CommandAddPortal, " - Creates a cross-server portal")
-    cPluginManager:BindCommand("/delportal", "core.ban", CommandDelPortal, " - Deletes a cross-server portal")
+    cPluginManager:BindCommand("/addportal", "core.ban", CommandAddPortal, "§6 - Creates a cross-server portal")
+    cPluginManager:BindCommand("/delportal", "core.ban", CommandDelPortal, "§6 - Deletes a cross-server portal")
 
     LOG(NAME .. " " .. VERSION .. " loaded successfully!")
     return true

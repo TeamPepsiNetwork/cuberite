@@ -9,7 +9,7 @@ function LoadServers()
                 SERVER_LIST[id] = data
                 SERVER_LIST["/" .. id] = data
                 data.id = id
-                cPluginManager:BindCommand("/" .. id, data.public and "core.help" or "core.ban", CommandChangeServer, " - Connect to §l" .. data.displayname)
+                cPluginManager:BindCommand("/" .. id, data.public and "core.help" or "core.ban", CommandChangeServer, "§7 - Warp to §l" .. data.displayname)
                 for _, alias in pairs(data.aliases) do
                     if (id ~= alias) then
                         if (SERVER_LIST[alias] ~= nil or SERVER_LIST["/" .. alias] ~= nil) then
@@ -18,7 +18,7 @@ function LoadServers()
                             SERVER_LIST[alias] = data
                             SERVER_LIST["/" .. alias] = data
                         end
-                        cPluginManager:BindCommand("/" .. alias, data.public and "core.help" or "core.ban", CommandChangeServer, " - Connect to §l" .. data.displayname)
+                        cPluginManager:BindCommand("/" .. alias, data.public and "core.help" or "core.ban", CommandChangeServer, "§7 - Warp to §l" .. data.displayname)
                     end
                 end
             end
