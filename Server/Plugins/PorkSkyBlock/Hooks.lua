@@ -59,9 +59,10 @@ function OnPlayerSpawn(a_Player)
                         return
                     end
                 end
-                a_Player:TeleportToCoords(SPAWN_X + 0.5, SPAWN_Y, SPAWN_Z)
+                LOG("Unable to find spawn position for player within " .. MAX_SPAWN_TRIES .. "searches!")
+                a_Player:TeleportToCoords(SPAWN_X + 0.5, SPAWN_Y, SPAWN_Z + 0.5)
             else
-                a_Player:TeleportToCoords(SPAWN_X + 0.5, SPAWN_Y, SPAWN_Z)
+                a_Player:TeleportToCoords(SPAWN_X + 0.5, SPAWN_Y, SPAWN_Z + 0.5)
                 -- TODO: respawn player on their island if they have one
             end
         end
