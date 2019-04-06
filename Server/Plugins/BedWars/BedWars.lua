@@ -38,13 +38,19 @@ function Initialize(Plugin)
         LOGERROR("Create the world or edit the world name \"Config.ini\".")
         return false
     end
+    WORLD:SetSpawn(0, 0, 0)
+    PrepareArena()
 
     -- Register hooks
-    cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED, TeleportPlayerToSpawn)
+    cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_SPAWNED, OnPlayerSpawned)
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_BREAKING_BLOCK, OnPlayerBreakingBlock)
 
     -- Command Bindings
+    cPluginManager:BindCommand("/resetarena", "bedwars.reset", function(a_Split, a_Player)
+        ResetArena(WORLD)
+        a_Player:SendMessage("§a§lArena reset!")
+    end, "§6- Reset BedWars arena")
 
     LOG(NAME .. " " .. VERSION .. " loaded successfully!")
     return true
@@ -110,8 +116,6 @@ end
 function LoadLuaFiles()
     local files = {
         "/Hooks.lua",
-        "/PorkianNoise.lua",
-        "/Portals.lua",
         -- libraries
         "/../lib/porklib.lua"
     }
