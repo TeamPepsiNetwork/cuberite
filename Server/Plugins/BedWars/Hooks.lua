@@ -32,5 +32,5 @@ function PrepareArena()
 end
 
 function ResetArena(a_World)
-    ARENA_BLOCKS:Write(a_World, -ARENA_RADIUS, 0, -ARENA_RADIUS)
+    ARENA_BLOCKS:Write(a_World, -ARENA_RADIUS, 0, -ARENA_RADIUS, 3)
 end
