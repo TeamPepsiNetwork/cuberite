@@ -11,6 +11,12 @@ LOCAL_FOLDER = nil -- plugin folder
 CONFIG_FILE = nil  -- config file path
 
 WORLD_NAME = nil   -- name of the lobby world
+SPAWN_MIN_X = 0
+SPAWN_MAX_X = 0
+SPAWN_MIN_Y = 0
+SPAWN_MAX_Y = 0
+SPAWN_MIN_Z = 0
+SPAWN_MAX_Z = 0
 
 WORLD = nil        -- default world instance
 
@@ -64,16 +70,46 @@ function LoadConfiguration()
     -- set up comments
     configIni:DeleteHeaderComments()
     configIni:DeleteKeyComments("Worlds")
+    configIni:DeleteKeyComments("Spawn")
     configIni:AddHeaderComment(" Configuration file for " .. NAME)
     configIni:AddHeaderComment(" Made by DaPorkchop_ for the Team Pepsi Server Network")
     configIni:AddHeaderComment(" https://daporkchop.net")
     configIni:AddHeaderComment(" https://pepsi.team")
     configIni:AddKeyComment("Worlds", " \"World_name\" is the name of the world that will be used as the lobby world")
+    configIni:AddKeyComment("Spawn", " All these values are the min/max positions of the spawn point, players will be unable to leave this area")
 
     -- read values from config
     WORLD_NAME = configIni:GetValueSet("Worlds", "World_name", "world")
 
+    SPAWN_MIN_X = configIni:GetValueSetI("Spawn", "MinX", 16)
+    SPAWN_MAX_X = configIni:GetValueSetI("Spawn", "MaxX", 16)
+    SPAWN_MIN_Y = configIni:GetValueSetI("Spawn", "MinY", 0)
+    SPAWN_MAX_Y = configIni:GetValueSetI("Spawn", "MaxY", 256)
+    SPAWN_MIN_Z = configIni:GetValueSetI("Spawn", "MinZ", 16)
+    SPAWN_MAX_Z = configIni:GetValueSetI("Spawn", "MaxZ", 16)
+
     -- sanity check values
+    if (SPAWN_MIN_X > SPAWN_MAX_X) then
+        local tmp = SPAWN_MAX_X
+        SPAWN_MAX_X = SPAWN_MIN_X
+        SPAWN_MIN_X = tmp
+        configIni:SetValueI("Spawn", "MinX", SPAWN_MIN_X)
+        configIni:SetValueI("Spawn", "MaxX", SPAWN_MAX_X)
+    end
+    if (SPAWN_MIN_Y > SPAWN_MAX_Y) then
+        local tmp = SPAWN_MAX_Y
+        SPAWN_MAX_Y = SPAWN_MIN_Y
+        SPAWN_MIN_Y = tmp
+        configIni:SetValueI("Spawn", "MinY", SPAWN_MIN_Y)
+        configIni:SetValueI("Spawn", "MaxY", SPAWN_MAX_Y)
+    end
+    if (SPAWN_MIN_Z > SPAWN_MAX_Z) then
+        local tmp = SPAWN_MAX_Z
+        SPAWN_MAX_Z = SPAWN_MIN_Z
+        SPAWN_MIN_Z = tmp
+        configIni:SetValueI("Spawn", "MinZ", SPAWN_MIN_Z)
+        configIni:SetValueI("Spawn", "MaxZ", SPAWN_MAX_Z)
+    end
 
     -- save config again
     configIni:WriteFile(CONFIG_FILE)
