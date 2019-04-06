@@ -25,8 +25,8 @@ end
 function PrepareArena()
     ARENA_BLOCKS = cBlockArea()
     ARENA_BLOCKS:Create(ARENA_RADIUS * 2, 256, ARENA_RADIUS * 2)
-    for x = 0, ARENA_RADIUS * 2 do
-        for z = 0, ARENA_RADIUS * 2 do
+    for x = 0, ARENA_RADIUS * 2 - 1 do
+        for z = 0, ARENA_RADIUS * 2 - 1 do
             ARENA_BLOCKS:SetRelBlockType(x, 0, z, E_BLOCK_BEDROCK)
             for y = 1, 64 do
                 ARENA_BLOCKS:SetRelBlockType(x, y, z, E_BLOCK_OBSIDIAN)
