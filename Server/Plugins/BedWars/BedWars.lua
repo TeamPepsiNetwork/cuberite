@@ -47,6 +47,7 @@ function Initialize(Plugin)
     cPluginManager:BindCommand("/resetarena", "bedwars.reset", function(a_Split, a_Player)
         ResetArena(WORLD)
         a_Player:SendMessage("§a§lArena reset!")
+        return true
     end, "§6- Reset BedWars arena")
 
     LOG(NAME .. " " .. VERSION .. " loaded successfully!")
