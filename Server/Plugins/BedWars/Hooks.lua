@@ -24,13 +24,18 @@ end
 
 function PrepareArena()
     ARENA_BLOCKS = cBlockArea()
-    ARENA_BLOCKS:Create(ARENA_RADIUS * 2, 256, ARENA_RADIUS * 2, 3)
-    ARENA_BLOCKS:Fill(3, E_BLOCK_AIR, 0)
-    ARENA_BLOCKS:FillRelCuboid(0, ARENA_RADIUS * 2, 1, 64, 0, ARENA_RADIUS * 2, 3, E_BLOCK_OBSIDIAN, 0)
-    ARENA_BLOCKS:FillRelCuboid(0, ARENA_RADIUS * 2, 0, 1, 0, ARENA_RADIUS * 2, 3, E_BLOCK_BEDROCK, 0)
+    ARENA_BLOCKS:Create(ARENA_RADIUS * 2, 256, ARENA_RADIUS * 2)
+    for x = 0, ARENA_RADIUS * 2 do
+        for z = 0, ARENA_RADIUS * 2 do
+            ARENA_BLOCKS:SetRelBlockType(x, 0, z, E_BLOCK_BEDROCK)
+            for y = 1, 64 do
+                ARENA_BLOCKS:SetRelBlockType(x, y, z, E_BLOCK_OBSIDIAN)
+            end
+        end
+    end
     ResetArena(WORLD)
 end
 
 function ResetArena(a_World)
-    ARENA_BLOCKS:Write(a_World, -ARENA_RADIUS, 0, -ARENA_RADIUS, 3)
+    ARENA_BLOCKS:Write(a_World, -ARENA_RADIUS, 0, -ARENA_RADIUS)
 end
