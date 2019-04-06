@@ -36,31 +36,10 @@ function OnPlayerSpawn(a_Player)
             -- player does not have a bed
             if (ANARCHY) then
                 -- find random valid spawn position
-                local a_World = a_Player:GetWorld()
-                for i = 0, MAX_SPAWN_TRIES do
-                    local x = math.random(-SPAWN_RADIUS, SPAWN_RADIUS)
-                    local y = math.random(1, 256)
-                    local z = math.random(-SPAWN_RADIUS, SPAWN_RADIUS)
-
-                    local below = a_World:GetBlock(x, y - 1, z)
-                    local feet = y > 255 and 0 or a_World:GetBlock(x, y, z)
-                    local head = y > 254 and 0 or a_World:GetBlock(x, y + 1, z)
-                    if (below ~= E_BLOCK_AIR
-                            and feet == E_BLOCK_AIR
-                            and head == E_BLOCK_AIR
-                            and below ~= E_BLOCK_FIRE
-                            and below ~= E_BLOCK_LAVA
-                            and below ~= E_BLOCK_STATIONARY_LAVA
-                            and below ~= E_BLOCK_WATER
-                            and below ~= E_BLOCK_STATIONARY_WATER
-                            and below ~= E_BLOCK_CACTUS
-                            and below ~= E_BLOCK_SIGN) then
-                        a_Player:TeleportToCoords(x + 0.5, y, z + 0.5)
-                        return
-                    end
+                if (not TeleportPlayerToRandomPosition(a_Player, a_Player:GetWorld(), 0, 0, SPAWN_RADIUS, MAX_SPAWN_TRIES)) then
+                    LOG("Unable to find spawn position for player within " .. MAX_SPAWN_TRIES .. " searches!")
+                    a_Player:TeleportToCoords(SPAWN_X + 0.5, SPAWN_Y, SPAWN_Z + 0.5)
                 end
-                LOG("Unable to find spawn position for player within " .. MAX_SPAWN_TRIES .. "searches!")
-                a_Player:TeleportToCoords(SPAWN_X + 0.5, SPAWN_Y, SPAWN_Z + 0.5)
             else
                 a_Player:TeleportToCoords(SPAWN_X + 0.5, SPAWN_Y, SPAWN_Z + 0.5)
                 -- TODO: respawn player on their island if they have one
@@ -71,6 +50,9 @@ end
 
 function OnPlayerJoined(a_Player)
     LoadPlayerdata(a_Player)
+    a_Player:SendMessage("§9Welcome to §l" .. INSTANCE_NAME .. "§r§9!")
+    a_Player:SendMessage("§9Type §o/start§r§9 to obtain starter items.")
+    a_Player:SendMessage("§9Type §o/challenge§r§9 to view the challenge list.")
 end
 
 function OnPlayerDestroyed(a_Player)
@@ -105,7 +87,7 @@ function OnWorldTick(a_World, a_TimeDelta)
 end
 
 function OnPlayerPlacingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta)
-    if (ANARCHY and SPAWN_REBUILD and a_BlockX <= 3 and a_BlockX >= -3 and a_BlockY <= 130 and a_BlockY >= 128 and a_BlockZ <= 3 and a_BlockZ >= -3) then
+    if (ANARCHY and SPAWN_REBUILD and a_BlockX <= 3 and a_BlockX >= -3 and a_BlockY <= 130 and a_BlockY >= 128 and a_BlockZ <= 3 and a_BlockZ >= -3 and not a_Player:HasPermission("skyblock.buildspawn")) then
         return false
     end
 end

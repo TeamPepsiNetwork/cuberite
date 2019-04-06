@@ -17,3 +17,34 @@ function clamp(val, min, max)
         return val
     end
 end
+
+function TeleportPlayerToRandomPosition(a_Player, a_World, a_CenterX, a_CenterZ, a_Radius, a_MaxTries)
+    if (a_MaxTries == nil) then
+        a_MaxTries = 512
+    elseif (a_MaxTries == -1) then
+        a_MaxTries = 2147483647
+    end
+    for i = 0, a_MaxTries do
+        local x = math.random(a_CenterX - a_Radius, a_CenterX + a_Radius)
+        local y = math.random(1, 256)
+        local z = math.random(a_CenterZ - a_Radius, a_CenterZ + a_Radius)
+
+        local below = a_World:GetBlock(x, y - 1, z)
+        local feet = y > 255 and 0 or a_World:GetBlock(x, y, z)
+        local head = y > 254 and 0 or a_World:GetBlock(x, y + 1, z)
+        if (below ~= E_BLOCK_AIR
+                and feet == E_BLOCK_AIR
+                and head == E_BLOCK_AIR
+                and below ~= E_BLOCK_FIRE
+                and below ~= E_BLOCK_LAVA
+                and below ~= E_BLOCK_STATIONARY_LAVA
+                and below ~= E_BLOCK_WATER
+                and below ~= E_BLOCK_STATIONARY_WATER
+                and below ~= E_BLOCK_CACTUS
+                and below ~= E_BLOCK_SIGN) then
+            a_Player:TeleportToCoords(x + 0.5, y, z + 0.5)
+            return true
+        end
+    end
+    return false
+end

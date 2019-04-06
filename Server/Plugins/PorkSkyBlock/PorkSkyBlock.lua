@@ -159,7 +159,9 @@ function LoadLuaFiles()
         "/Playerdata.lua",
         -- commands
         "/command/CommandChallenge.lua",
-        "/command/CommandStart.lua"
+        "/command/CommandStart.lua",
+        -- libraries
+        "/../lib/porklib.lua"
     }
 
     for _, file in pairs(files) do

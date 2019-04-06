@@ -1,8 +1,8 @@
--- Lobby plugin for the Team Pepsi server network
+-- basically a port of torobedwars to cuberite
 -- as usual, by DaPorkchop_
 -- yeet
 
-NAME = "PorkLobby"
+NAME = "BedWars"
 VERSION_NUMBER = 1
 VERSION = "v0.0.1-SNAPSHOT"
 
@@ -10,15 +10,11 @@ PLUGIN = nil       -- plugin instance
 LOCAL_FOLDER = nil -- plugin folder
 CONFIG_FILE = nil  -- config file path
 
-WORLD_NAME = nil   -- name of the lobby world
-SPAWN_MIN_X = 0
-SPAWN_MAX_X = 0
-SPAWN_MIN_Y = 0
-SPAWN_MAX_Y = 0
-SPAWN_MIN_Z = 0
-SPAWN_MAX_Z = 0
+WORLD_NAME = nil   -- name of the world
 
 WORLD = nil        -- default world instance
+
+ARENA_RADIUS = 0   -- radius of the arena (in blocks)
 
 function Initialize(Plugin)
     LOG("Loading " .. NAME .. " " .. VERSION .. " (version id " .. VERSION_NUMBER .. ")")
@@ -44,22 +40,11 @@ function Initialize(Plugin)
     end
 
     -- Register hooks
-    cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATING, OnChunkGenerating)
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED, TeleportPlayerToSpawn)
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
-    --cPluginManager:AddHook(cPluginManager.HOOK_ENTITY_CHANGING_WORLD, OnEntityChangingWorld);
-    cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_BREAKING_BLOCK, OnPlayerBreakingBlock);
+    cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_BREAKING_BLOCK, OnPlayerBreakingBlock)
 
     -- Command Bindings
-    cPluginManager:BindCommand("/addportal", "core.ban", CommandAddPortal, "§6- Creates a cross-server portal")
-    cPluginManager:BindCommand("/delportal", "core.ban", CommandDelPortal, "§6- Deletes a cross-server portal")
-
-    -- Load chunks
-    for x = -8, 8 do
-        for z = -8, 8 do
-            WORLD:SetChunkAlwaysTicked(x, z, true)
-        end
-    end
 
     LOG(NAME .. " " .. VERSION .. " loaded successfully!")
     return true
