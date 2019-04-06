@@ -24,10 +24,10 @@ end
 
 function PrepareArena()
     ARENA_BLOCKS = cBlockArea()
-    ARENA_BLOCKS:Create(ARENA_RADIUS * 2, 256, ARENA_RADIUS * 2, baTypes + baMetas)
-    ARENA_BLOCKS:Fill(baTypes + baMetas, E_BLOCK_AIR, 0)
-    ARENA_BLOCKS:FillRelCuboid(0, ARENA_RADIUS * 2, 1, 64, 0, ARENA_RADIUS * 2, baTypes + baMetas, E_BLOCK_OBSIDIAN, 0)
-    ARENA_BLOCKS:FillRelCuboid(0, ARENA_RADIUS * 2, 0, 1, 0, ARENA_RADIUS * 2, baTypes + baMetas, E_BLOCK_BEDROCK, 0)
+    ARENA_BLOCKS:Create(ARENA_RADIUS * 2, 256, ARENA_RADIUS * 2, 3)
+    ARENA_BLOCKS:Fill(3, E_BLOCK_AIR, 0)
+    ARENA_BLOCKS:FillRelCuboid(0, ARENA_RADIUS * 2, 1, 64, 0, ARENA_RADIUS * 2, 3, E_BLOCK_OBSIDIAN, 0)
+    ARENA_BLOCKS:FillRelCuboid(0, ARENA_RADIUS * 2, 0, 1, 0, ARENA_RADIUS * 2, 3, E_BLOCK_BEDROCK, 0)
     ResetArena(WORLD)
 end
 
