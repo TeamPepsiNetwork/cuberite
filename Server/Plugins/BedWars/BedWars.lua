@@ -29,9 +29,6 @@ function Initialize(Plugin)
     LoadLuaFiles() -- load all
     LoadConfiguration()
 
-    InitNoise()
-    LoadPortals()
-
     WORLD = cRoot:Get():GetWorld(WORLD_NAME)
     if (WORLD == nil) then
         LOGERROR(PLUGIN:GetName() .. " requires the world \"" .. WORLD_NAME .. "\", but it was not found!")
