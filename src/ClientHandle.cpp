@@ -395,7 +395,7 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 		if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
 		{
 			//cRoot::Get()->BroadcastChatJoin(Printf("%s has joined the game", GetUsername().c_str()));
-			//LOGINFO("Player %s has joined the game", m_Username.c_str());
+			LOGINFO("Player %s has joined the game", m_Username.c_str());
 		}
 
 		m_ConfirmPosition = m_Player->GetPosition();
