@@ -1,6 +1,6 @@
 function TeleportPlayerToSpawn(a_Player)
     -- teleport player to world spawn
-    a_Player:TeleportToCoords(a_Player:GetWorld():GetSpawnX(), world:GetSpawnY(), world:GetSpawnZ())
+    a_Player:TeleportToCoords(a_Player:GetWorld():GetSpawnX(), a_Player:GetWorld():GetSpawnY(), a_Player:GetWorld():GetSpawnZ())
 end
 
 function OnChunkGenerating(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc)
