@@ -93,8 +93,8 @@ end
 
 function OnWorldTick(a_World, a_TimeDelta)
     if (ANARCHY and SPAWN_REBUILD) then
-        for x in -3, 3 do
-            for z in -3, 3 do
+        for x = -3, 3 do
+            for z = -3, 3 do
                 a_World:FastSetBlock(x, 128, z, E_BLOCK_BEDROCK, 0)
                 a_World:FastSetBlock(x, 129, z, E_BLOCK_AIR, 0)
                 a_World:FastSetBlock(x, 130, z, E_BLOCK_AIR, 0)
