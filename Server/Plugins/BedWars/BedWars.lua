@@ -42,6 +42,7 @@ function Initialize(Plugin)
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_SPAWNED, OnPlayerSpawned)
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_BREAKING_BLOCK, OnPlayerBreakingBlock)
+    cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATED, OnChunkGenerated)
 
     -- Command Bindings
     cPluginManager:BindCommand("/resetarena", "bedwars.reset", function(a_Split, a_Player)

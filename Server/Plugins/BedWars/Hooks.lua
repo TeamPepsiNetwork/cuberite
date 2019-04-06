@@ -1,5 +1,9 @@
 ARENA_BLOCKS = nil
 
+function OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc)
+    a_ChunkDesc:ReplaceRelCuboid(0, 16, 0, 256, 0, 16, E_BLOCK_AIR, 0, E_BLOCK_BARRIER, 0)
+end
+
 function OnPlayerSpawned(a_Player)
     if (a_Player:GetPosX() == 0 and a_Player:GetPosY() == 0 and a_Player:GetPosZ() == 0) then
         local world = a_Player:GetWorld()
