@@ -10,7 +10,7 @@ function OnPlayerSpawned(a_Player)
     if (a_Player:GetPosX() == 0 and a_Player:GetPosY() == 0 and a_Player:GetPosZ() == 0) then
         -- player is respawning, reset their stuff
         ResetPlayer(a_Player)
-    elseif (PLAYER_HISTORY[a_Player:GetUUID()] ~= RESET_COUNTER) then
+    elseif (PLAYER_HISTORY[a_Player:GetUUID()] == nil or PLAYER_HISTORY[a_Player:GetUUID()] ~= RESET_COUNTER) then
         -- the arena has been reset since the last time the player was around
         ResetPlayer(a_Player)
     end
@@ -18,7 +18,7 @@ end
 
 function ResetPlayer(a_Player)
     local world = a_Player:GetWorld()
-    if (world:GetName() == WORLD_NAME and not TeleportPlayerToRandomPosition(a_Player, a_Player:GetWorld(), 0, 0, 32, -1)) then
+    if (world:GetName() == WORLD_NAME and not TeleportPlayerToRandomPosition(a_Player, a_Player:GetWorld(), 0, 0, ARENA_RADIUS, -1)) then
         a_Player:TeleportToCoords(0.5, 256, 0.5)
     end
     local inv = a_Player:GetInventory()
