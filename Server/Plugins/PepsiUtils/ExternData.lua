@@ -1,4 +1,10 @@
 SERVER_LIST = {}
+RANK_LOOKUP = {}
+
+function LoadExternData()
+    LoadServers()
+    LoadPlayers()
+end
 
 function LoadServers()
     cUrlClient:Get("https://gist.githubusercontent.com/DaMatrix/8b7ff92fcc7e49c0f511a8ed207d8e92/raw/teampepsi-server-list.json",
@@ -28,6 +34,35 @@ function LoadServers()
                             end
                         end
                         cPluginManager:BindCommand("/" .. id, data.public and "core.help" or "pepsiutils.transfer." .. id, CommandChangeServer, "§7 - Warp to §l" .. data.displayname .. (aliasesString == nil and "" or ("§r§7 (aliases: " .. aliasesString .. ")")))
+                    end
+                else
+                    LOGERROR("Unable to fetch server list!!!")
+                    LOGERROR(a_Data)
+                end
+            end)
+end
+
+function LoadPlayers()
+    cUrlClient:Get("https://gist.githubusercontent.com/DaMatrix/8b7ff92fcc7e49c0f511a8ed207d8e92/raw/teampepsi-server-players.json",
+            function(a_Body, a_Data)
+                if (a_Body) then
+                    local tempList = cJson:Parse(a_Body)
+                    for _, data in pairs(tempList) do
+                        if (#data.name > 0) then
+                            --cRankManager:RemoveRank(data.name)
+                            cRankManager:AddRank(data.name, "", "", data.prefix)
+                            cRankManager:SetRankVisuals(data.name, "", "", data.prefix)
+                            cRankManager:AddGroupToRank(data.name == "Admin" and "Everything" or "Default", data.name)
+                            for _, uuid in pairs(data.members) do
+                                --aUUID:FromString(uuid)
+                                --cRankManager:SetPlayerRank(uuid, cMojangAPI:GetPlayerNameFromUUID(uuid), data.name)
+                                --cRankManager:SetPlayerRank(uuid, "jeff", data.name)
+                                --LOG("Fetching name for " .. uuid .. "...")
+                                --LOG(uuid .. " => " .. cMojangAPI:GetPlayerNameFromUUID(aUUID))
+                                RANK_LOOKUP[cMojangAPI:MakeUUIDShort(uuid)] = data.name
+                                cRoot:Get():DoWithPlayerByUUID(uuid, OnPlayerJoined)
+                            end
+                        end
                     end
                 else
                     LOGERROR("Unable to fetch server list!!!")

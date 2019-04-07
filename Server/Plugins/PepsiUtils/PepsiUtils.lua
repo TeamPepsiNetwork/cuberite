@@ -22,10 +22,11 @@ function Initialize(Plugin)
 
     LoadLuaFiles() -- load all
     LoadConfiguration()
-    LoadServers()
+    LoadExternData()
 
     -- Register hooks
     cPluginManager:AddHook(cPluginManager.HOOK_WORLD_STARTED, OnWorldStarted)
+    cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED, OnPlayerJoined)
 
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK, OnPlayerUsingBlock)
     cPluginManager:AddHook(cPluginManager.HOOK_EXPLODING, OnExploding)
@@ -66,8 +67,8 @@ end
 function LoadLuaFiles()
     local files = {
         "/DamageOverrideHooks.lua",
+        "/ExternData.lua",
         "/Hooks.lua",
-        "/Servers.lua",
         -- libraries
         "/../lib/porklib.lua"
     }

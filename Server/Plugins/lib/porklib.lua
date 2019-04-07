@@ -52,3 +52,12 @@ end
 function XYZToString(x, y, z)
     return "(" .. x .. ", " .. y .. ", " .. z .. ")"
 end
+
+function GetDisplayName(a_Player)
+    local _, _, color = cRankManager:GetPlayerMsgVisuals(a_Player:GetUUID())
+    if (color ~= nil) then
+        return "§" .. color .. a_Player:GetName() .. "§r"
+    else
+        return a_Player:GetName()
+    end
+end
