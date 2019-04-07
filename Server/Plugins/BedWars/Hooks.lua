@@ -1,4 +1,6 @@
 ARENA_BLOCKS = nil
+PLAYER_HISTORY = {}
+RESET_COUNTER = 0
 
 function OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc)
     a_ChunkDesc:ReplaceRelCuboid(0, 16, 0, 256, 0, 16, E_BLOCK_AIR, 0, E_BLOCK_BARRIER, 0)
@@ -7,6 +9,9 @@ end
 function OnPlayerSpawned(a_Player)
     if (a_Player:GetPosX() == 0 and a_Player:GetPosY() == 0 and a_Player:GetPosZ() == 0) then
         -- player is respawning, reset their stuff
+        ResetPlayer(a_Player)
+    elseif (PLAYER_HISTORY[a_Player:GetUUID()] ~= RESET_COUNTER) then
+        -- the arena has been reset since the last time the player was around
         ResetPlayer(a_Player)
     end
 end
@@ -50,6 +55,7 @@ function ResetPlayer(a_Player)
             inv:SetSlot(i, cItem(E_ITEM_BED, 1, colors[math.random(1, #colors)]))
         end
     end
+    PLAYER_HISTORY[a_Player:GetUUID()] = RESET_COUNTER
 end
 
 function OnPlayerMoving(a_Player, a_OldPos, a_NewPos)
@@ -84,6 +90,7 @@ function ResetArena(a_World)
 end
 
 function DoResetArena(a_World)
+    RESET_COUNTER = RESET_COUNTER + 1
     ARENA_BLOCKS:Write(a_World, -ARENA_RADIUS, 0, -ARENA_RADIUS)
     a_World:ForEachPlayer(function(a_Player)
         a_Player:SendMessage("§9§lResetting arena...")

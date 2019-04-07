@@ -60,6 +60,7 @@ function Initialize(Plugin)
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK, OnPlayerUsingBlock)
     cPluginManager:AddHook(cPluginManager.HOOK_EXPLODING, OnExploding)
     cPluginManager:AddHook(cPluginManager.HOOK_EXPLODED, OnExploded)
+    cPluginManager:AddHook(cPluginManager.HOOK_TAKE_DAMAGE, OnTakeDamage)
     cPluginManager:AddHook(cPluginManager.HOOK_KILLED, OnKilled)
 
     -- Command Bindings
@@ -68,6 +69,11 @@ function Initialize(Plugin)
         a_Player:SendMessage("§a§lArena reset!")
         return true
     end, "§6- Reset BedWars arena")
+    cPluginManager:BindConsoleCommand("resetarena", function(a_Split)
+        DoResetArena(WORLD)
+        LOG("Arena reset!")
+        return true
+    end, "- Reset BedWars arena")
 
     LOG(NAME .. " " .. VERSION .. " loaded successfully!")
     return true

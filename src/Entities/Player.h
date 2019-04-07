@@ -216,13 +216,13 @@ public:
 	/** Sets the player team, nullptr if none */
 	void SetTeam(cTeam * a_Team);
 
+	/** Return the associated statistic and achievement manager. */
+	cStatManager & GetStatManager() { return m_Stats; }
+
 	// tolua_end
 
 	/** Forces the player to query the scoreboard for his team */
 	cTeam * UpdateTeam(void);
-
-	/** Return the associated statistic and achievement manager. */
-	cStatManager & GetStatManager() { return m_Stats; }
 
 	/** Awards the player an achievement.
 	If all prerequisites are met, this method will award the achievement and will broadcast a chat message.
