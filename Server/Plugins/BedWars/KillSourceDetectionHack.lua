@@ -62,12 +62,12 @@ function OnKilled(a_Victim, a_Info, a_DeathMessage)
             end
         end
         KILLS_OBJECTIVE:SubScore(a_Victim:GetName(), 1)
-        LOG("Final damage dealt: " .. a_Info.FinalDamage)
+        -- LOG("Final damage dealt: " .. a_Info.FinalDamage)
     end
 end
 
 function CalculateMaxDealableDamage(victim, amount)
-    LOG("Attempting to deal " .. amount .. " damage, victim has " .. victim:GetHealth() .. " remaining.")
+    -- LOG("Attempting to deal " .. amount .. " damage, victim has " .. victim:GetHealth() .. " remaining.")
     return math.max(math.min(amount, victim:GetHealth()), 0)
 end
 
@@ -75,7 +75,7 @@ function ManageDamageDealtStatistic(attacker, victim, amount)
     -- LOG("Attempting to deal " .. amount .. " damage, victim has " .. victim:GetHealth() .. " remaining.")
     --amount = CalculateMaxDealableDamage(victim, amount)
     if (amount > 0) then
-        LOG("Damage dealt: " .. amount)
+        -- LOG("Damage dealt: " .. amount)
         amount = math.floor(amount * 10 + 0.5)
         attacker:GetStatManager():AddValue(statDamageDealt, amount)
     end

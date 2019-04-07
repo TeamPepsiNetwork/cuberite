@@ -91,10 +91,14 @@ end
 
 function DoResetArena(a_World)
     RESET_COUNTER = RESET_COUNTER + 1
-    ARENA_BLOCKS:Write(a_World, -ARENA_RADIUS, 0, -ARENA_RADIUS)
-    a_World:ForEachPlayer(function(a_Player)
-        a_Player:SendMessage("§9§lResetting arena...")
+    a_World:ForEachEntity(function(a_Entity)
+        if (a_Entity:IsPickup()) then
+            a_Entity:Destroy()
+        elseif (a_Entity:IsPlayer()) then
+            a_Entity:SendMessage("§9§lResetting arena...")
+        end
     end)
+    ARENA_BLOCKS:Write(a_World, -ARENA_RADIUS, 0, -ARENA_RADIUS)
     a_World:ForEachPlayer(ResetPlayer)
     QUEUED_RIGHT_CLICKS = {}
 end
