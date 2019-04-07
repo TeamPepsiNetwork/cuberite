@@ -1,0 +1,4 @@
+Config.ini
+*.sqlite3
+noise.json
+portals/
