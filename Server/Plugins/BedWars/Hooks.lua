@@ -39,10 +39,10 @@ function ResetPlayer(a_Player)
     inv:SetHotbarSlot(3, cItem(E_BLOCK_OBSIDIAN, 64, 0))
     inv:SetHotbarSlot(8, cItem(E_ITEM_GOLDEN_APPLE, 64, E_META_GOLDEN_APPLE_ENCHANTED))
     inv:SetInventorySlot(8, cItem(E_ITEM_ARROW, 64))
-    --inv:SetArmorSlot(0, cItem(E_ITEM_DIAMOND_HELMET, 1, 0, "unbreaking=3;protection=4;blastprotection=4"))
-    --inv:SetArmorSlot(1, cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "unbreaking=3;protection=4;blastprotection=4"))
-    --inv:SetArmorSlot(2, cItem(E_ITEM_DIAMOND_LEGGINGS, 1, 0, "unbreaking=3;protection=4;blastprotection=4"))
-    --inv:SetArmorSlot(3, cItem(E_ITEM_DIAMOND_BOOTS, 1, 0, "unbreaking=3;protection=4;blastprotection=4;featherfalling=4"))
+    inv:SetArmorSlot(0, cItem(E_ITEM_DIAMOND_HELMET, 1, 0, "unbreaking=3;blastprotection=4"))
+    inv:SetArmorSlot(1, cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "unbreaking=3;blastprotection=4"))
+    inv:SetArmorSlot(2, cItem(E_ITEM_DIAMOND_LEGGINGS, 1, 0, "unbreaking=3;blastprotection=4"))
+    inv:SetArmorSlot(3, cItem(E_ITEM_DIAMOND_BOOTS, 1, 0, "unbreaking=3;blastprotection=4;featherfalling=4"))
     local colors = {
         E_META_WOOL_WHITE,
         E_META_WOOL_LIGHTBLUE,
