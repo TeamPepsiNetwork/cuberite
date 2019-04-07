@@ -8,7 +8,6 @@ PLUGIN = nil
 LOCAL_FOLDER = nil
 CONFIG_FILE = nil
 
---DISABLE_JOIN_MESSAGE = true
 USE_CHAT_PREFIXES = false
 
 function Initialize(Plugin)
@@ -26,9 +25,13 @@ function Initialize(Plugin)
     LoadServers()
 
     -- Register hooks
-    --cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_JOINED, OnPlayerJoined)
-    --cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_DESTROYED, OnPlayerDestroyed)
     cPluginManager:AddHook(cPluginManager.HOOK_WORLD_STARTED, OnWorldStarted)
+
+    cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK, OnPlayerUsingBlock)
+    cPluginManager:AddHook(cPluginManager.HOOK_EXPLODING, OnExploding)
+    cPluginManager:AddHook(cPluginManager.HOOK_EXPLODED, OnExploded)
+    cPluginManager:AddHook(cPluginManager.HOOK_TAKE_DAMAGE, OnTakeDamage)
+    cPluginManager:AddHook(cPluginManager.HOOK_KILLED, OnKilled)
 
     LOG(NAME .. " " .. VERSION .. " loaded successfully!")
     return true
@@ -49,11 +52,9 @@ function LoadConfiguration()
     configIni:AddHeaderComment(" Made by DaPorkchop_ for the Team Pepsi Server Network")
     configIni:AddHeaderComment(" https://daporkchop.net")
     configIni:AddHeaderComment(" https://pepsi.team")
-    --configIni:AddKeyComment("General", " \"Disable_join_message\" controls whether or not to broadcast player join/leave messages")
     configIni:AddKeyComment("General", " \"Use_chat_prefixes\" controls whether or not to prefix chat messages (e.g. [INFO])")
 
     -- read values from config
-    --DISABLE_JOIN_MESSAGE = configIni:GetValueSetB("General", "Disable_join_message", true)
     USE_CHAT_PREFIXES = configIni:GetValueSetB("General", "Use_chat_prefixes", false)
 
     -- sanity check values
@@ -64,6 +65,7 @@ end
 
 function LoadLuaFiles()
     local files = {
+        "/DamageOverrideHooks.lua",
         "/Hooks.lua",
         "/Servers.lua",
         -- libraries

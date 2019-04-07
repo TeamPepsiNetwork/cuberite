@@ -61,11 +61,6 @@ function Initialize(Plugin)
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_BREAKING_BLOCK, OnPlayerBreakingBlock)
     cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATED, OnChunkGenerated)
-
-    cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK, OnPlayerUsingBlock)
-    cPluginManager:AddHook(cPluginManager.HOOK_EXPLODING, OnExploding)
-    cPluginManager:AddHook(cPluginManager.HOOK_EXPLODED, OnExploded)
-    cPluginManager:AddHook(cPluginManager.HOOK_TAKE_DAMAGE, OnTakeDamage)
     cPluginManager:AddHook(cPluginManager.HOOK_KILLED, OnKilled)
 
     -- Command Bindings
@@ -120,7 +115,6 @@ end
 function LoadLuaFiles()
     local files = {
         "/Hooks.lua",
-        "/KillSourceDetectionHack.lua",
         -- libraries
         "/../lib/porklib.lua"
     }

@@ -404,124 +404,109 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 	{
 		cPlayer * Player = static_cast<cPlayer *>(a_TDI.Attacker);
 
-		Player->GetEquippedItem().GetHandler()->OnEntityAttack(Player, this);
+		if ((a_TDI.DamageType != dtExplosion)) {
+			Player->GetEquippedItem().GetHandler()->OnEntityAttack(Player, this);
 
-		// TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
+			// TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
 
-		// IsOnGround() only is false if the player is moving downwards
-		// Ref: https://minecraft.gamepedia.com/Damage#Critical_Hits
-		if (!Player->IsOnGround())
-		{
-			if ((a_TDI.DamageType == dtAttack) || (a_TDI.DamageType == dtArrowAttack))
-			{
-				a_TDI.FinalDamage *= 1.5;  // 150% damage
-				m_World->BroadcastEntityAnimation(*this, 4);  // Critical hit
+			// IsOnGround() only is false if the player is moving downwards
+			// Ref: https://minecraft.gamepedia.com/Damage#Critical_Hits
+			if (!Player->IsOnGround()) {
+				if ((a_TDI.DamageType == dtAttack) || (a_TDI.DamageType == dtArrowAttack)) {
+					a_TDI.FinalDamage *= 1.5;  // 150% damage
+					m_World->BroadcastEntityAnimation(*this, 4);  // Critical hit
+				}
 			}
-		}
 
-		const cEnchantments & Enchantments = Player->GetEquippedItem().m_Enchantments;
+			const cEnchantments &Enchantments = Player->GetEquippedItem().m_Enchantments;
 
-		int SharpnessLevel = static_cast<int>(Enchantments.GetLevel(cEnchantments::enchSharpness));
-		int SmiteLevel = static_cast<int>(Enchantments.GetLevel(cEnchantments::enchSmite));
-		int BaneOfArthropodsLevel = static_cast<int>(Enchantments.GetLevel(cEnchantments::enchBaneOfArthropods));
+			int SharpnessLevel = static_cast<int>(Enchantments.GetLevel(cEnchantments::enchSharpness));
+			int SmiteLevel = static_cast<int>(Enchantments.GetLevel(cEnchantments::enchSmite));
+			int BaneOfArthropodsLevel = static_cast<int>(Enchantments.GetLevel(cEnchantments::enchBaneOfArthropods));
 
-		if (SharpnessLevel > 0)
-		{
-			a_TDI.FinalDamage += static_cast<int>(ceil(1.25 * SharpnessLevel));
-		}
-		else if (SmiteLevel > 0)
-		{
-			if (IsMob())
-			{
-				cMonster * Monster = static_cast<cMonster *>(this);
-				switch (Monster->GetMobType())
-				{
-					case mtSkeleton:
-					case mtZombie:
-					case mtWither:
-					case mtZombiePigman:
-					{
-						a_TDI.FinalDamage += static_cast<int>(ceil(2.5 * SmiteLevel));
-						break;
+			if (SharpnessLevel > 0) {
+				a_TDI.FinalDamage += static_cast<int>(ceil(1.25 * SharpnessLevel));
+			} else if (SmiteLevel > 0) {
+				if (IsMob()) {
+					cMonster *Monster = static_cast<cMonster *>(this);
+					switch (Monster->GetMobType()) {
+						case mtSkeleton:
+						case mtZombie:
+						case mtWither:
+						case mtZombiePigman: {
+							a_TDI.FinalDamage += static_cast<int>(ceil(2.5 * SmiteLevel));
+							break;
+						}
+						default:
+							break;
 					}
-					default: break;
+				}
+			} else if (BaneOfArthropodsLevel > 0) {
+				if (IsMob()) {
+					cMonster *Monster = static_cast<cMonster *>(this);
+					switch (Monster->GetMobType()) {
+						case mtSpider:
+						case mtCaveSpider:
+						case mtSilverfish: {
+							a_TDI.FinalDamage += static_cast<int>(ceil(2.5 * BaneOfArthropodsLevel));
+							// The duration of the effect is a random value between 1 and 1.5 seconds at level I,
+							// increasing the max duration by 0.5 seconds each level
+							// Ref: https://minecraft.gamepedia.com/Enchanting#Bane_of_Arthropods
+							int Duration = 20 + GetRandomProvider().RandInt(BaneOfArthropodsLevel * 10);  // Duration in ticks
+							Monster->AddEntityEffect(cEntityEffect::effSlowness, Duration, 4);
+
+							break;
+						}
+						default:
+							break;
+					}
+				}
+			}
+
+			int FireAspectLevel = static_cast<int>(Enchantments.GetLevel(cEnchantments::enchFireAspect));
+			if (FireAspectLevel > 0) {
+				int BurnTicks = 3;
+
+				if (FireAspectLevel > 1) {
+					BurnTicks += 4 * (FireAspectLevel - 1);
+				}
+				if (!IsMob() && !IsInWater()) {
+					StartBurning(BurnTicks * 20);
+				} else if (IsMob() && !IsInWater()) {
+					cMonster *Monster = static_cast<cMonster *>(this);
+					switch (Monster->GetMobType()) {
+						case mtGhast:
+						case mtZombiePigman:
+						case mtMagmaCube: {
+							break;
+						}
+						default:
+							StartBurning(BurnTicks * 20);
+					}
+				}
+			}
+
+			unsigned int ThornsLevel = 0;
+			const cItem ArmorItems[] = {
+					GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots()
+			};
+			for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++) {
+				const cItem &Item = ArmorItems[i];
+				ThornsLevel = std::max(ThornsLevel, Item.m_Enchantments.GetLevel(cEnchantments::enchThorns));
+			}
+
+			if (ThornsLevel > 0) {
+				int Chance = static_cast<int>(ThornsLevel * 15);
+
+				auto &Random = GetRandomProvider();
+
+				if (Random.RandBool(Chance / 100.0)) {
+					a_TDI.Attacker->TakeDamage(dtAttack, this, 0, Random.RandInt(1, 4), 0);
 				}
 			}
 		}
-		else if (BaneOfArthropodsLevel > 0)
-		{
-			if (IsMob())
-			{
-				cMonster * Monster = static_cast<cMonster *>(this);
-				switch (Monster->GetMobType())
-				{
-					case mtSpider:
-					case mtCaveSpider:
-					case mtSilverfish:
-					{
-						a_TDI.FinalDamage += static_cast<int>(ceil(2.5 * BaneOfArthropodsLevel));
-						// The duration of the effect is a random value between 1 and 1.5 seconds at level I,
-						// increasing the max duration by 0.5 seconds each level
-						// Ref: https://minecraft.gamepedia.com/Enchanting#Bane_of_Arthropods
-						int Duration = 20 + GetRandomProvider().RandInt(BaneOfArthropodsLevel * 10);  // Duration in ticks
-						Monster->AddEntityEffect(cEntityEffect::effSlowness, Duration, 4);
 
-						break;
-					}
-					default: break;
-				}
-			}
-		}
-
-		int FireAspectLevel = static_cast<int>(Enchantments.GetLevel(cEnchantments::enchFireAspect));
-		if (FireAspectLevel > 0)
-		{
-			int BurnTicks = 3;
-
-			if (FireAspectLevel > 1)
-			{
-				BurnTicks += 4 * (FireAspectLevel - 1);
-			}
-			if (!IsMob() && !IsInWater())
-			{
-				StartBurning(BurnTicks * 20);
-			}
-			else if (IsMob() && !IsInWater())
-			{
-				cMonster * Monster = static_cast<cMonster *>(this);
-				switch (Monster->GetMobType())
-				{
-					case mtGhast:
-					case mtZombiePigman:
-					case mtMagmaCube:
-					{
-						break;
-					}
-					default: StartBurning(BurnTicks * 20);
-				}
-			}
-		}
-
-		unsigned int ThornsLevel = 0;
-		const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
-		for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
-		{
-			const cItem & Item = ArmorItems[i];
-			ThornsLevel = std::max(ThornsLevel, Item.m_Enchantments.GetLevel(cEnchantments::enchThorns));
-		}
-
-		if (ThornsLevel > 0)
-		{
-			int Chance = static_cast<int>(ThornsLevel * 15);
-
-			auto & Random = GetRandomProvider();
-
-			if (Random.RandBool(Chance / 100.0))
-			{
-				a_TDI.Attacker->TakeDamage(dtAttack, this, 0, Random.RandInt(1, 4), 0);
-			}
-		}
-
+		LOGD("Cuberite: Attacker dealt %d damage", a_TDI.FinalDamage);
 		Player->GetStatManager().AddValue(statDamageDealt, static_cast<StatValue>(floor(a_TDI.FinalDamage * 10 + 0.5)));
 	}
 
@@ -540,11 +525,12 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	if (m_Health <= 0)
 	{
-		KilledBy(a_TDI);
+        TakeDamageInfo copied = a_TDI;
+		KilledBy(copied);
 
-		if (a_TDI.Attacker != nullptr)
+		if (copied.Attacker != nullptr)
 		{
-			a_TDI.Attacker->Killed(this);
+            copied.Attacker->Killed(this);
 		}
 	}
 	return true;

@@ -39,10 +39,10 @@ function ResetPlayer(a_Player)
     inv:SetHotbarSlot(3, cItem(E_BLOCK_OBSIDIAN, 64, 0))
     inv:SetHotbarSlot(8, cItem(E_ITEM_GOLDEN_APPLE, 64, E_META_GOLDEN_APPLE_ENCHANTED))
     inv:SetInventorySlot(8, cItem(E_ITEM_ARROW, 64))
-    inv:SetArmorSlot(0, cItem(E_ITEM_DIAMOND_HELMET, 1, 0, "unbreaking=3;protection=4;blastprotection=4"))
-    inv:SetArmorSlot(1, cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "unbreaking=3;protection=4;blastprotection=4"))
-    inv:SetArmorSlot(2, cItem(E_ITEM_DIAMOND_LEGGINGS, 1, 0, "unbreaking=3;protection=4;blastprotection=4"))
-    inv:SetArmorSlot(3, cItem(E_ITEM_DIAMOND_BOOTS, 1, 0, "unbreaking=3;protection=4;blastprotection=4;featherfalling=4"))
+    --inv:SetArmorSlot(0, cItem(E_ITEM_DIAMOND_HELMET, 1, 0, "unbreaking=3;protection=4;blastprotection=4"))
+    --inv:SetArmorSlot(1, cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "unbreaking=3;protection=4;blastprotection=4"))
+    --inv:SetArmorSlot(2, cItem(E_ITEM_DIAMOND_LEGGINGS, 1, 0, "unbreaking=3;protection=4;blastprotection=4"))
+    --inv:SetArmorSlot(3, cItem(E_ITEM_DIAMOND_BOOTS, 1, 0, "unbreaking=3;protection=4;blastprotection=4;featherfalling=4"))
     local colors = {
         E_META_WOOL_WHITE,
         E_META_WOOL_LIGHTBLUE,
@@ -50,7 +50,7 @@ function ResetPlayer(a_Player)
         E_META_WOOL_BLUE,
         E_META_WOOL_RED
     }
-    for i = 0, 40 - 1 do
+    for i = 4, 40 - 1 do
         if (inv:GetSlot(i):IsEmpty()) then
             inv:SetSlot(i, cItem(E_ITEM_BED, 1, colors[math.random(1, #colors)]))
         end
@@ -91,14 +91,31 @@ end
 
 function DoResetArena(a_World)
     RESET_COUNTER = RESET_COUNTER + 1
-    a_World:ForEachEntity(function(a_Entity)
-        if (a_Entity:IsPickup()) then
-            a_Entity:Destroy()
-        elseif (a_Entity:IsPlayer()) then
-            a_Entity:SendMessage("§9§lResetting arena...")
-        end
+    a_World:ScheduleTask(0, function(a_World)
+        a_World:ForEachEntity(function(a_Entity)
+            if (a_Entity:IsPickup()) then
+                a_Entity:Destroy()
+            elseif (a_Entity:IsPlayer()) then
+                a_Entity:SendMessage("§9§lResetting arena...")
+            end
+        end)
+        ARENA_BLOCKS:Write(a_World, -ARENA_RADIUS, 0, -ARENA_RADIUS)
+        a_World:ForEachPlayer(ResetPlayer)
+        QUEUED_RIGHT_CLICKS = {}
     end)
-    ARENA_BLOCKS:Write(a_World, -ARENA_RADIUS, 0, -ARENA_RADIUS)
-    a_World:ForEachPlayer(ResetPlayer)
-    QUEUED_RIGHT_CLICKS = {}
+end
+
+function OnKilled(a_Victim, a_Info, a_DeathMessage)
+    if (a_Victim:GetWorld() == WORLD and a_Victim:IsPlayer()) then
+        if (a_Info.Attacker == nil) then
+            -- LOG("Warning: null attacker!")
+        elseif (a_Info.Attacker:IsPlayer()) then
+            a_Info.Attacker:GetClientHandle():SendSoundEffect("entity.experience_orb.pickup", a_Info.Attacker:GetEyePosition(), 1.0, 63)
+            if (a_Info.Attacker ~= a_Victim) then
+                KILLS_OBJECTIVE:AddScore(a_Info.Attacker:GetName(), 1)
+            end
+        end
+        KILLS_OBJECTIVE:SubScore(a_Victim:GetName(), 1)
+        -- LOG("BedWars: Killed with " .. a_Info.FinalDamage .. " damage from " .. DamageTypeToString(a_Info.DamageType) .. "!")
+    end
 end
