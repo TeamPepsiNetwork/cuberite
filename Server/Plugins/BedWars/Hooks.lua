@@ -112,10 +112,10 @@ function OnKilled(a_Victim, a_Info, a_DeathMessage)
         elseif (a_Info.Attacker:IsPlayer()) then
             a_Info.Attacker:GetClientHandle():SendSoundEffect("entity.experience_orb.pickup", a_Info.Attacker:GetEyePosition(), 1.0, 63)
             if (a_Info.Attacker ~= a_Victim) then
-                KILLS_OBJECTIVE:AddScore(a_Info.Attacker, 1)
+                KILLS_OBJECTIVE:AddScore(a_Info.Attacker:GetName(), 1)
             end
         end
-        KILLS_OBJECTIVE:SubScore(a_Victim, 1)
+        KILLS_OBJECTIVE:SubScore(a_Victim:GetName(), 1)
         -- LOG("BedWars: Killed with " .. a_Info.FinalDamage .. " damage from " .. DamageTypeToString(a_Info.DamageType) .. "!")
     end
 end
