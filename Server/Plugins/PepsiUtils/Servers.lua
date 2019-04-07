@@ -19,7 +19,7 @@ function LoadServers()
                                     SERVER_LIST["/" .. alias] = data
                                 end
                                 --cPluginManager:BindCommand("/" .. alias, data.public and "core.help" or "core.ban", CommandChangeServer, "§7 - Warp to §l" .. data.displayname)
-                                cPluginManager:BindCommand("/" .. alias, data.public and "core.help" or "core.ban", CommandChangeServer, "")
+                                cPluginManager:BindCommand("/" .. alias, data.public and "core.help" or "pepsiutils.transfer." .. id, CommandChangeServer, "")
                                 if (aliasesString == nil) then
                                     aliasesString = "/" .. alias
                                 else
@@ -27,7 +27,7 @@ function LoadServers()
                                 end
                             end
                         end
-                        cPluginManager:BindCommand("/" .. id, data.public and "core.help" or "core.ban", CommandChangeServer, "§7 - Warp to §l" .. data.displayname .. (aliasesString == nil and "" or ("§r§7 (aliases: " .. aliasesString .. ")")))
+                        cPluginManager:BindCommand("/" .. id, data.public and "core.help" or "pepsiutils.transfer." .. id, CommandChangeServer, "§7 - Warp to §l" .. data.displayname .. (aliasesString == nil and "" or ("§r§7 (aliases: " .. aliasesString .. ")")))
                     end
                 else
                     LOGERROR("Unable to fetch server list!!!")

@@ -18,7 +18,7 @@ ARENA_RADIUS = 0                  -- radius of the arena (in blocks)
 RESET_DELAY = 0                   -- delay until arena reset
 
 SCOREBOARD = nil                  -- the Scoreboard instance for the world
-KILLS_OBJECTIVE_NAME = "kills"    -- the name of the kill counter objective
+KILLS_OBJECTIVE_NAME = "score"    -- the name of the kill counter objective
 KILLS_OBJECTIVE = nil             -- the kill counter objective
 
 function Initialize(Plugin)
@@ -51,10 +51,13 @@ function Initialize(Plugin)
     SCOREBOARD = WORLD:GetScoreBoard()
     KILLS_OBJECTIVE = SCOREBOARD:GetObjective(KILLS_OBJECTIVE_NAME)
     if (KILLS_OBJECTIVE == nil) then
-        KILLS_OBJECTIVE = SCOREBOARD:RegisterObjective(KILLS_OBJECTIVE_NAME, "§9§lScore§r", cObjective.otStat)
+        KILLS_OBJECTIVE = SCOREBOARD:RegisterObjective(KILLS_OBJECTIVE_NAME, "jeff", cObjective.otStat)
         assert(KILLS_OBJECTIVE ~= nil, "Unable to register kills objective!")
     end
+    KILLS_OBJECTIVE:SetDisplayName("§9§lScore§r")
+    SCOREBOARD:SetDisplay(KILLS_OBJECTIVE_NAME, cScoreboard.dsList)
     SCOREBOARD:SetDisplay(KILLS_OBJECTIVE_NAME, cScoreboard.dsSidebar)
+    --SCOREBOARD:SetDisplay(KILLS_OBJECTIVE_NAME, cScoreboard.dsName)
 
     -- Register hooks
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_SPAWNED, OnPlayerSpawned)
@@ -74,7 +77,6 @@ function Initialize(Plugin)
         LOG("Arena reset!")
         return true
     end, "- Reset BedWars arena")
-
 
     LOG(NAME .. " " .. VERSION .. " loaded successfully!")
     return true
