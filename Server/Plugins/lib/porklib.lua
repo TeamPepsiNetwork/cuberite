@@ -25,9 +25,9 @@ function TeleportPlayerToRandomPosition(a_Player, a_World, a_CenterX, a_CenterZ,
         a_MaxTries = 2147483647
     end
     for i = 0, a_MaxTries do
-        local x = math.random(a_CenterX - a_Radius, a_CenterX + a_Radius)
+        local x = math.random(a_CenterX - a_Radius, a_CenterX + a_Radius - 1)
         local y = math.random(1, 256)
-        local z = math.random(a_CenterZ - a_Radius, a_CenterZ + a_Radius)
+        local z = math.random(a_CenterZ - a_Radius, a_CenterZ + a_Radius - 1)
 
         local below = a_World:GetBlock(x, y - 1, z)
         local feet = y > 255 and 0 or a_World:GetBlock(x, y, z)

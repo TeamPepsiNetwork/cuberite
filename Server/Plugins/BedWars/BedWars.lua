@@ -41,12 +41,17 @@ function Initialize(Plugin)
         return false
     end
     WORLD:SetSpawn(0, 0, 0)
+    for x = -3, 3 do
+        for z = -3, 3 do
+            WORLD:SetChunkAlwaysTicked(x, z, true)
+        end
+    end
     PrepareArena()
 
     SCOREBOARD = WORLD:GetScoreBoard()
     KILLS_OBJECTIVE = SCOREBOARD:GetObjective(KILLS_OBJECTIVE_NAME)
     if (KILLS_OBJECTIVE == nil) then
-        KILLS_OBJECTIVE = SCOREBOARD:RegisterObjective(KILLS_OBJECTIVE_NAME, "Score", cObjective.otStat)
+        KILLS_OBJECTIVE = SCOREBOARD:RegisterObjective(KILLS_OBJECTIVE_NAME, "§9§lScore§r", cObjective.otStat)
         assert(KILLS_OBJECTIVE ~= nil, "Unable to register kills objective!")
     end
     SCOREBOARD:SetDisplay(KILLS_OBJECTIVE_NAME, cScoreboard.dsSidebar)
@@ -74,6 +79,7 @@ function Initialize(Plugin)
         LOG("Arena reset!")
         return true
     end, "- Reset BedWars arena")
+
 
     LOG(NAME .. " " .. VERSION .. " loaded successfully!")
     return true
