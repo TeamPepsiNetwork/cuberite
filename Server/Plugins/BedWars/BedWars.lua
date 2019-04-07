@@ -6,15 +6,20 @@ NAME = "BedWars"
 VERSION_NUMBER = 1
 VERSION = "v0.0.1-SNAPSHOT"
 
-PLUGIN = nil       -- plugin instance
-LOCAL_FOLDER = nil -- plugin folder
-CONFIG_FILE = nil  -- config file path
+PLUGIN = nil                      -- plugin instance
+LOCAL_FOLDER = nil                -- plugin folder
+CONFIG_FILE = nil                 -- config file path
 
-WORLD_NAME = nil   -- name of the world
+WORLD_NAME = nil                  -- name of the world
 
-WORLD = nil        -- default world instance
+WORLD = nil                       -- default world instance
 
-ARENA_RADIUS = 0   -- radius of the arena (in blocks)
+ARENA_RADIUS = 0                  -- radius of the arena (in blocks)
+RESET_DELAY = 0                   -- delay until arena reset
+
+SCOREBOARD = nil                  -- the Scoreboard instance for the world
+KILLS_OBJECTIVE_NAME = "kills"    -- the name of the kill counter objective
+KILLS_OBJECTIVE = nil             -- the kill counter objective
 
 function Initialize(Plugin)
     LOG("Loading " .. NAME .. " " .. VERSION .. " (version id " .. VERSION_NUMBER .. ")")
@@ -38,15 +43,28 @@ function Initialize(Plugin)
     WORLD:SetSpawn(0, 0, 0)
     PrepareArena()
 
+    SCOREBOARD = WORLD:GetScoreBoard()
+    KILLS_OBJECTIVE = SCOREBOARD:GetObjective(KILLS_OBJECTIVE_NAME)
+    if (KILLS_OBJECTIVE == nil) then
+        KILLS_OBJECTIVE = SCOREBOARD:RegisterObjective(KILLS_OBJECTIVE_NAME, "Score", cObjective.otStat)
+        assert(KILLS_OBJECTIVE ~= nil, "Unable to register kills objective!")
+    end
+    SCOREBOARD:SetDisplay(KILLS_OBJECTIVE_NAME, cScoreboard.dsSidebar)
+
     -- Register hooks
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_SPAWNED, OnPlayerSpawned)
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_MOVING, OnPlayerMoving)
     cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_BREAKING_BLOCK, OnPlayerBreakingBlock)
     cPluginManager:AddHook(cPluginManager.HOOK_CHUNK_GENERATED, OnChunkGenerated)
 
+    cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK, OnPlayerUsingBlock)
+    cPluginManager:AddHook(cPluginManager.HOOK_EXPLODING, OnExploding)
+    cPluginManager:AddHook(cPluginManager.HOOK_EXPLODED, OnExploded)
+    cPluginManager:AddHook(cPluginManager.HOOK_KILLED, OnKilled)
+
     -- Command Bindings
     cPluginManager:BindCommand("/resetarena", "bedwars.reset", function(a_Split, a_Player)
-        ResetArena(WORLD)
+        DoResetArena(WORLD)
         a_Player:SendMessage("§a§lArena reset!")
         return true
     end, "§6- Reset BedWars arena")
@@ -74,10 +92,12 @@ function LoadConfiguration()
     configIni:AddHeaderComment(" https://pepsi.team")
     configIni:AddKeyComment("Worlds", " \"World_name\" is the name of the world that will be used as the lobby world")
     configIni:AddKeyComment("Arenas", " \"Arena_radius\" is the radius of the arena")
+    configIni:AddKeyComment("Arenas", " \"Reset_delay\" is the delay (in ticks) between arena resets")
 
     -- read values from config
     WORLD_NAME = configIni:GetValueSet("Worlds", "World_name", "world_nether")
     ARENA_RADIUS = configIni:GetValueSetI("Arenas", "Arena_radius", 32)
+    RESET_DELAY = configIni:GetValueSetI("Arenas", "Reset_delay", 432000)
 
     -- sanity check values
 
@@ -88,6 +108,7 @@ end
 function LoadLuaFiles()
     local files = {
         "/Hooks.lua",
+        "/KillSourceDetectionHack.lua",
         -- libraries
         "/../lib/porklib.lua"
     }

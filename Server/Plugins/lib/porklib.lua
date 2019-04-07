@@ -48,3 +48,7 @@ function TeleportPlayerToRandomPosition(a_Player, a_World, a_CenterX, a_CenterZ,
     end
     return false
 end
+
+function XYZToString(x, y, z)
+    return "(" .. x .. ", " .. y .. ", " .. z .. ")"
+end

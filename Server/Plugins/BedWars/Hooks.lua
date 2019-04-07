@@ -6,16 +6,54 @@ end
 
 function OnPlayerSpawned(a_Player)
     if (a_Player:GetPosX() == 0 and a_Player:GetPosY() == 0 and a_Player:GetPosZ() == 0) then
-        local world = a_Player:GetWorld()
-        -- player is respawning
-        if (world:GetName() == WORLD_NAME and not TeleportPlayerToRandomPosition(a_Player, a_Player:GetWorld(), 0, 0, 32, 1024)) then
-            a_Player:TeleportToCoords(0.5, 256, 0.5)
+        -- player is respawning, reset their stuff
+        ResetPlayer(a_Player)
+    end
+end
+
+function ResetPlayer(a_Player)
+    local world = a_Player:GetWorld()
+    if (world:GetName() == WORLD_NAME and not TeleportPlayerToRandomPosition(a_Player, a_Player:GetWorld(), 0, 0, 32, -1)) then
+        a_Player:TeleportToCoords(0.5, 256, 0.5)
+    end
+    local inv = a_Player:GetInventory()
+    -- reset everything
+    inv:Clear()
+    a_Player:SetMaxHealth(20)
+    a_Player:SetHealth(20)
+    a_Player:SetFoodLevel(20)
+    a_Player:SetFoodSaturationLevel(20)
+    a_Player:SetFoodTickTimer(0)
+    a_Player:ClearEntityEffects()
+    a_Player:SetInvulnerableTicks(40)
+
+    -- default items
+    inv:SetHotbarSlot(0, cItem(E_ITEM_DIAMOND_SWORD, 1, 0, "sharpness=5;fireaspect=2;unbreaking=3;knockback=3"))
+    inv:SetHotbarSlot(1, cItem(E_ITEM_BOW, 1, 0, "power=5;flame=1;unbreaking=3;knockback=3"))
+    inv:SetHotbarSlot(2, cItem(E_ITEM_DIAMOND_PICKAXE, 1, 0, "efficiency=7;unbreaking=3"))
+    inv:SetHotbarSlot(3, cItem(E_BLOCK_OBSIDIAN, 64, 0))
+    inv:SetHotbarSlot(8, cItem(E_ITEM_GOLDEN_APPLE, 64, E_META_GOLDEN_APPLE_ENCHANTED))
+    inv:SetInventorySlot(8, cItem(E_ITEM_ARROW, 64))
+    inv:SetArmorSlot(0, cItem(E_ITEM_DIAMOND_HELMET, 1, 0, "unbreaking=3;protection=4;blastprotection=4"))
+    inv:SetArmorSlot(1, cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "unbreaking=3;protection=4;blastprotection=4"))
+    inv:SetArmorSlot(2, cItem(E_ITEM_DIAMOND_LEGGINGS, 1, 0, "unbreaking=3;protection=4;blastprotection=4"))
+    inv:SetArmorSlot(3, cItem(E_ITEM_DIAMOND_BOOTS, 1, 0, "unbreaking=3;protection=4;blastprotection=4;featherfalling=4"))
+    local colors = {
+        E_META_WOOL_WHITE,
+        E_META_WOOL_LIGHTBLUE,
+        E_META_WOOL_CYAN,
+        E_META_WOOL_BLUE,
+        E_META_WOOL_RED
+    }
+    for i = 0, 40 - 1 do
+        if (inv:GetSlot(i):IsEmpty()) then
+            inv:SetSlot(i, cItem(E_ITEM_BED, 1, colors[math.random(1, #colors)]))
         end
     end
 end
 
 function OnPlayerMoving(a_Player, a_OldPos, a_NewPos)
-    if ((a_NewPos.x > ARENA_RADIUS or a_NewPos.x < -ARENA_RADIUS or a_NewPos.y > 257 or a_NewPos.y < 1 or a_NewPos.z > ARENA_RADIUS or a_NewPos.z < -ARENA_RADIUS) and not a_Player:HasPermission("bedwars.leavearena")) then
+    if (a_Player:GetWorld() == WORLD and (a_NewPos.x > ARENA_RADIUS or a_NewPos.x < -ARENA_RADIUS or a_NewPos.y > 257 or a_NewPos.y < 1 or a_NewPos.z > ARENA_RADIUS or a_NewPos.z < -ARENA_RADIUS) and not a_Player:HasPermission("bedwars.leavearena")) then
         return true
     end
 end
@@ -32,7 +70,7 @@ function PrepareArena()
     for x = 0, ARENA_RADIUS * 2 - 1 do
         for z = 0, ARENA_RADIUS * 2 - 1 do
             ARENA_BLOCKS:SetRelBlockType(x, 0, z, E_BLOCK_BEDROCK)
-            for y = 1, 64 do
+            for y = 1, 32 do
                 ARENA_BLOCKS:SetRelBlockType(x, y, z, E_BLOCK_OBSIDIAN)
             end
         end
@@ -41,5 +79,15 @@ function PrepareArena()
 end
 
 function ResetArena(a_World)
+    DoResetArena(a_World)
+    a_World:ScheduleTask(RESET_DELAY, ResetArena)
+end
+
+function DoResetArena(a_World)
     ARENA_BLOCKS:Write(a_World, -ARENA_RADIUS, 0, -ARENA_RADIUS)
+    a_World:ForEachPlayer(function(a_Player)
+        a_Player:SendMessage("§9§lResetting arena...")
+    end)
+    a_World:ForEachPlayer(ResetPlayer)
+    QUEUED_RIGHT_CLICKS = {}
 end
