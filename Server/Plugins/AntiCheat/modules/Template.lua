@@ -1,6 +1,7 @@
 local name = "Template"
 local INSTANCE = {
     name = name,
+    enabledByDefault = false,
     load = function(config)
     end,
     init = function()

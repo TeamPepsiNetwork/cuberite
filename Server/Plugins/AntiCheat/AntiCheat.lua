@@ -13,6 +13,8 @@ CONFIG_FILE = nil                 -- config file path
 ALL_MODULES = {}
 MODULES = {}
 
+TRACER_LOS = 1 + 2 + 4
+
 function Initialize(Plugin)
     LOG("Loading " .. NAME .. " " .. VERSION .. " (version id " .. VERSION_NUMBER .. ")")
 
@@ -74,7 +76,7 @@ function LoadConfiguration()
         if (module.name == nil) then
             module.name = key
         end
-        if (configIni:GetValueSetB("Modules", module.name, true)) then
+        if (configIni:GetValueSetB("Modules", module.name, module.enabledByDefault)) then
             MODULES[key] = module
         end
         if (module.load ~= nil) then

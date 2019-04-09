@@ -2921,8 +2921,8 @@ static int tolua_cLineBlockTracer_FirstSolidHitTrace(lua_State * tolua_S)
 	// Check params:
 	cLuaState L(tolua_S);
 	if (
-		!L.CheckParamUserType(idx, "cWorld")
-	)
+			!L.CheckParamUserType(idx, "cWorld")
+			)
 	{
 		return 0;
 	}
@@ -2931,9 +2931,9 @@ static int tolua_cLineBlockTracer_FirstSolidHitTrace(lua_State * tolua_S)
 	{
 		// This is the number variant of the call:
 		if (
-			!L.CheckParamNumber(idx + 1, idx + 6) ||
-			!L.CheckParamEnd(idx + 7)
-		)
+				!L.CheckParamNumber(idx + 1, idx + 6) ||
+				!L.CheckParamEnd(idx + 7)
+				)
 		{
 			return 0;
 		}
@@ -2967,9 +2967,9 @@ static int tolua_cLineBlockTracer_FirstSolidHitTrace(lua_State * tolua_S)
 	{
 		// This is the Vector3d-based variant of the call:
 		if (
-			!L.CheckParamUserType(idx + 1, "Vector3<double>", idx + 2) ||
-			!L.CheckParamEnd(idx + 3)
-		)
+				!L.CheckParamUserType(idx + 1, "Vector3<double>", idx + 2) ||
+				!L.CheckParamEnd(idx + 3)
+				)
 		{
 			return 0;
 		}
@@ -3000,6 +3000,108 @@ static int tolua_cLineBlockTracer_FirstSolidHitTrace(lua_State * tolua_S)
 	}
 
 	tolua_error(L, "cLineBlockTracer:FirstSolidHitTrace(): Invalid parameters, expected either a set of coords, or two Vector3d's", nullptr);
+	return 0;
+}
+
+static int tolua_cLineBlockTracer_FirstOpaqueHitTrace(lua_State * tolua_S)
+{
+	/* Supported function signatures:
+	cLineBlockTracer:FirstOpaqueHitTrace(World, StartX, StartY, StartZ, EndX, EndY, EndZ) -> bool, [Vector3d, Vector3i, eBlockFace]  // Canonical
+	cLineBlockTracer:FirstOpaqueHitTrace(World, Start, End) -> bool, [Vector3d, Vector3i, eBlockFace]                                // Canonical
+	cLineBlockTracer.FirstOpaqueHitTrace(World, StartX, StartY, StartZ, EndX, EndY, EndZ) -> bool, [Vector3d, Vector3i, eBlockFace]
+	cLineBlockTracer.FirstOpaqueHitTrace(World, Start, End) -> bool, [Vector3d, Vector3i, eBlockFace]
+	*/
+
+	// If the first param is the cLineBlockTracer class, shift param index by one:
+	int idx = 1;
+	tolua_Error err;
+	if (tolua_isusertable(tolua_S, 1, "cLineBlockTracer", 0, &err))
+	{
+		idx = 2;
+	}
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+			!L.CheckParamUserType(idx, "cWorld")
+			)
+	{
+		return 0;
+	}
+
+	if (L.IsParamNumber(idx + 1))
+	{
+		// This is the number variant of the call:
+		if (
+				!L.CheckParamNumber(idx + 1, idx + 6) ||
+				!L.CheckParamEnd(idx + 7)
+				)
+		{
+			return 0;
+		}
+		// Get the params:
+		cWorld * world;
+		double startX, startY, startZ;
+		double endX, endY, endZ;
+		if (!L.GetStackValues(idx, world, startX, startY, startZ, endX, endY, endZ))
+		{
+			LOGWARNING("cLineBlockTracer:FirstOpaqueHitTrace(): Cannot read parameters, aborting the trace.");
+			L.LogStackTrace();
+			L.LogStackValues("Values on the stack");
+			return 0;
+		}
+		Vector3d hitCoords;
+		Vector3i hitBlockCoords;
+		eBlockFace hitBlockFace;
+		auto isHit = cLineBlockTracer::FirstOpaqueHitTrace(*world, Vector3d(startX, startY, startZ), Vector3d(endX, endY, endZ), hitCoords, hitBlockCoords, hitBlockFace);
+		L.Push(isHit);
+		if (!isHit)
+		{
+			return 1;
+		}
+		L.Push(hitCoords);
+		L.Push(hitBlockCoords);
+		L.Push(hitBlockFace);
+		return 4;
+	}
+
+	if (L.IsParamUserType(idx + 1, "Vector3<double>"))
+	{
+		// This is the Vector3d-based variant of the call:
+		if (
+				!L.CheckParamUserType(idx + 1, "Vector3<double>", idx + 2) ||
+				!L.CheckParamEnd(idx + 3)
+				)
+		{
+			return 0;
+		}
+		// Get the params:
+		cWorld * world;
+		Vector3d * start;
+		Vector3d * end;
+		if (!L.GetStackValues(idx, world, start, end))
+		{
+			LOGWARNING("cLineBlockTracer:FirstOpaqueHitTrace(): Cannot read parameters, aborting the trace.");
+			L.LogStackTrace();
+			L.LogStackValues("Values on the stack");
+			return 0;
+		}
+		Vector3d hitCoords;
+		Vector3i hitBlockCoords;
+		eBlockFace hitBlockFace;
+		auto isHit = cLineBlockTracer::FirstOpaqueHitTrace(*world, *start, *end, hitCoords, hitBlockCoords, hitBlockFace);
+		L.Push(isHit);
+		if (!isHit)
+		{
+			return 1;
+		}
+		L.Push(hitCoords);
+		L.Push(hitBlockCoords);
+		L.Push(hitBlockFace);
+		return 4;
+	}
+
+	tolua_error(L, "cLineBlockTracer:FirstOpaqueHitTrace(): Invalid parameters, expected either a set of coords, or two Vector3d's", nullptr);
 	return 0;
 }
 
@@ -4162,6 +4264,7 @@ void cManualBindings::Bind(lua_State * tolua_S)
 
 		tolua_beginmodule(tolua_S, "cLineBlockTracer");
 			tolua_function(tolua_S, "FirstSolidHitTrace", tolua_cLineBlockTracer_FirstSolidHitTrace);
+			tolua_function(tolua_S, "FirstOpaqueHitTrace", tolua_cLineBlockTracer_FirstOpaqueHitTrace);
 			tolua_function(tolua_S, "LineOfSightTrace",   tolua_cLineBlockTracer_LineOfSightTrace);
 			tolua_function(tolua_S, "Trace",              tolua_cLineBlockTracer_Trace);
 

@@ -9,6 +9,7 @@ WATER_SPEED = 2.2 / 20.0
 
 local INSTANCE = {
     name = name,
+    enabledByDefault = false,
     load = function(config)
         log = config:GetValueSetB(name, "Log", log)
     end,

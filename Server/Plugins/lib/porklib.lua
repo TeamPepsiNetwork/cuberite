@@ -49,6 +49,10 @@ function TeleportPlayerToRandomPosition(a_Player, a_World, a_CenterX, a_CenterZ,
     return false
 end
 
+function VectorToString(vec)
+    return "(" .. vec.x .. ", " .. vec.y .. ", " .. vec.z .. ")"
+end
+
 function XYZToString(x, y, z)
     return "(" .. x .. ", " .. y .. ", " .. z .. ")"
 end

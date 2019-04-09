@@ -72,6 +72,20 @@ public:
 		eBlockFace & a_HitBlockFace
 	);
 
+	/** Traces until the first opaque block is hit (or until end, whichever comes first.
+	If a solid opaque was hit, returns true and fills a_HitCoords, a_HitBlockCoords and a_HitBlockFace.
+	If a_End is encountered without hitting any opaque block, returns false and doesn't touch a_HitCoords, a_HitBlockCoords nor a_HitBlockFace.
+	a_HitCoords is the exact coords of the hit,
+	a_HitBlockCoords are the coords of the opaque block that was hit,
+	a_HitBlockFace is the face of the opaque block that was hit. */
+	static bool FirstOpaqueHitTrace(
+			cWorld & a_World,
+			const Vector3d & a_Start, const Vector3d & a_End,
+			Vector3d & a_HitCoords,
+			Vector3i & a_HitBlockCoords,
+			eBlockFace & a_HitBlockFace
+	);
+
 protected:
 	/** The start point of the trace */
 	double m_StartX, m_StartY, m_StartZ;
