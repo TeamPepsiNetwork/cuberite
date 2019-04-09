@@ -33,8 +33,11 @@ function Initialize(Plugin)
     for _, module in pairs(MODULES) do
         if (module.init ~= nil) then
             module.init()
+            LOG("Loaded " .. module.name)
         end
     end
+
+    cRoot:Get():ForEachPlayer(OnPlayerSpawned)
 
     -- Command Bindings
 
@@ -68,6 +71,9 @@ function LoadConfiguration()
 
     -- read values from config
     for key, module in pairs(ALL_MODULES) do
+        if (module.name == nil) then
+            module.name = key
+        end
         if (configIni:GetValueSetB("Modules", module.name, true)) then
             MODULES[key] = module
         end

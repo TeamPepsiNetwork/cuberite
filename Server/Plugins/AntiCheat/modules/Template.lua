@@ -1,11 +1,14 @@
-ALL_MODULES["template"] = {
-    name = "Template",
+local name = "Template"
+local INSTANCE = {
+    name = name,
     load = function(config)
     end,
     init = function()
     end,
     shutdown = function()
     end,
-    onJoin = function(a_Player, data)
+    onSpawn = function(a_Player, data)
     end
 }
+
+ALL_MODULES[name] = INSTANCE

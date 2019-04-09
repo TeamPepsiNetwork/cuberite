@@ -56,8 +56,28 @@ end
 function GetDisplayName(a_Player)
     local _, _, color = cRankManager:GetPlayerMsgVisuals(a_Player:GetUUID())
     if (color ~= nil) then
-        return "§" .. color .. a_Player:GetName() .. "§r"
+        return "§" .. color .. a_Player:GetName()-- .. "§r"
     else
         return a_Player:GetName()
     end
+end
+
+function Distance(a_Vec1, a_Vec2)
+    return math.sqrt(sq(a_Vec1.x - a_Vec2.x) + sq(a_Vec1.y - a_Vec2.y) + sq(a_Vec1.z - a_Vec2.z))
+end
+
+function DistanceSq(a_Vec1, a_Vec2)
+    return sq(a_Vec1.x - a_Vec2.x) + sq(a_Vec1.y - a_Vec2.y) + sq(a_Vec1.z - a_Vec2.z)
+end
+
+function DistanceXZ(a_Vec1, a_Vec2)
+    return math.sqrt(sq(a_Vec1.x - a_Vec2.x) + sq(a_Vec1.z - a_Vec2.z))
+end
+
+function DistanceSqXZ(a_Vec1, a_Vec2)
+    return sq(a_Vec1.x - a_Vec2.x) + sq(a_Vec1.z - a_Vec2.z)
+end
+
+function sq(t)
+    return t * t
 end
