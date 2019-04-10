@@ -7,9 +7,50 @@
 
 // fwd:
 class cBlockHandler;
+class cBoundingBox;
 
 
+class cBounds	{
+public:
+	std::list<cBoundingBox*> bounds;
+	size_t count;
 
+	void recompute();
+
+	cBounds():
+			bounds({}),
+			count(bounds.size())
+	{
+	}
+
+    cBounds(const std::list<cBoundingBox*> & bounds):
+            bounds(bounds),
+            count(bounds.size())
+    {
+    }
+
+    cBounds(cBoundingBox* bounds):
+            bounds({bounds}),
+            count(1)
+    {
+    }
+};
+
+class cBlockBoundingBoxes	{
+public:
+	cBounds types[16];
+
+	cBlockBoundingBoxes():
+			types{cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds()}
+	{
+	}
+
+	void recompute(BLOCKTYPE m_BlockType);
+	cBlockBoundingBoxes* set(size_t i, cBounds bounds);
+	cBlockBoundingBoxes* setAll(size_t i, cBounds bounds);
+	cBlockBoundingBoxes* setAll(cBounds bounds);
+	cBlockBoundingBoxes* setRange(size_t min, size_t max, cBounds bounds);
+};
 
 // tolua_begin
 class cBlockInfo
@@ -75,6 +116,8 @@ public:
 		m_Handler()
 	{
 	}
+
+	cBlockBoundingBoxes boundingBoxes;
 
 private:
 	/** Storage for all the BlockInfo structures. */

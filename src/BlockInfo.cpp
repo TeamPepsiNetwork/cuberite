@@ -11,6 +11,41 @@ void cBlockInfo::sHandlerDeleter::operator () (cBlockHandler * a_Handler)
 }
 
 
+void cBounds::recompute() {
+	//this->count = this->bounds.size();
+	throw "NYEF";
+}
+
+void cBlockBoundingBoxes::recompute(BLOCKTYPE m_BlockType) {
+	for (int i = 15; i >= 0; i--)	{
+        if (this->types[i].count == 0) {
+            this->types[i] = cBounds({
+                                             new cBoundingBox(0, 1, 0, 1, 0, 1)
+                                     });
+        }
+		this->types[i].count = this->types[i].bounds.size();
+	}
+}
+
+cBlockBoundingBoxes* cBlockBoundingBoxes::set(size_t i, cBounds bounds) {
+	this->types[i] = bounds;
+	return this;
+}
+
+cBlockBoundingBoxes* cBlockBoundingBoxes::setAll(cBounds bounds) {
+	for (int i = 15; i >= 0; i--)	{
+		this->types[i] = bounds;
+	}
+	return this;
+}
+
+cBlockBoundingBoxes* cBlockBoundingBoxes::setRange(size_t min, size_t max, cBounds bounds) {
+	for (; min < max; min++)	{
+		this->types[min] = bounds;
+	}
+	return this;
+}
+
 
 
 
@@ -948,8 +983,76 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_CONCRETE_POWDER              ].m_Hardness = 0.5f;
 	Info[E_BLOCK_STRUCTURE_BLOCK              ].m_Hardness = -1.0f;
 
+	//bounding boxes
+    LOG("Bed");
+	Info[E_BLOCK_BED].boundingBoxes.setAll(cBounds(new cBoundingBox(0, 1, 0, 0.5625, 0, 1)));
+    LOG("Cake");
+	Info[E_BLOCK_CAKE].boundingBoxes
+            .set(0, cBounds(new cBoundingBox(0.0625, 0.9375, 0, 0.5, 0.0625, 0.9375)))
+            ->set(1, cBounds(new cBoundingBox(0.0625 * 3, 0.9375, 0, 0.5, 0.0625, 0.9375)))
+            ->set(2, cBounds(new cBoundingBox(0.0625 * 5, 0.9375, 0, 0.5, 0.0625, 0.9375)))
+            ->set(3, cBounds(new cBoundingBox(0.0625 * 7, 0.9375, 0, 0.5, 0.0625, 0.9375)))
+            ->set(4, cBounds(new cBoundingBox(0.0625 * 9, 0.9375, 0, 0.5, 0.0625, 0.9375)))
+            ->set(5, cBounds(new cBoundingBox(0.0625 * 11, 0.9375, 0, 0.5, 0.0625, 0.9375)))
+            ->set(6, cBounds(new cBoundingBox(0.0625 * 13, 0.9375, 0, 0.5, 0.0625, 0.9375)));
+    LOG("Enchantment table");
+    Info[E_BLOCK_ENCHANTMENT_TABLE].boundingBoxes.setAll(cBounds(new cBoundingBox(0, 1, 0, 0.75, 0, 1)));
+    LOG("Slabs");
+    Info[E_BLOCK_STONE_SLAB].boundingBoxes
+            .setRange(0, 8, cBounds(new cBoundingBox(0, 1, 0, 0.5, 0, 1)))
+            ->setRange(8, 16, cBounds(new cBoundingBox(0, 1, 0.5, 1, 0, 1)));
+    Info[E_BLOCK_PURPUR_SLAB].boundingBoxes
+            .setRange(0, 8, cBounds(new cBoundingBox(0, 1, 0, 0.5, 0, 1)))
+            ->setRange(8, 16, cBounds(new cBoundingBox(0, 1, 0.5, 1, 0, 1)));
+    Info[E_BLOCK_WOODEN_SLAB].boundingBoxes
+            .setRange(0, 8, cBounds(new cBoundingBox(0, 1, 0, 0.5, 0, 1)))
+            ->setRange(8, 16, cBounds(new cBoundingBox(0, 1, 0.5, 1, 0, 1)));
+    Info[E_BLOCK_RED_SANDSTONE_SLAB].boundingBoxes
+            .setRange(0, 8, cBounds(new cBoundingBox(0, 1, 0, 0.5, 0, 1)))
+            ->setRange(8, 16, cBounds(new cBoundingBox(0, 1, 0.5, 1, 0, 1)));
+    LOG("Snow");
+    Info[E_BLOCK_SNOW].boundingBoxes
+            .set(1, cBounds(new cBoundingBox(0, 1, 0, 0.125, 0, 1)))
+            ->set(2, cBounds(new cBoundingBox(0, 1, 0, 0.125 * 2, 0, 1)))
+            ->set(3, cBounds(new cBoundingBox(0, 1, 0, 0.125 * 3, 0, 1)))
+            ->set(4, cBounds(new cBoundingBox(0, 1, 0, 0.125 * 4, 0, 1)))
+            ->set(5, cBounds(new cBoundingBox(0, 1, 0, 0.125 * 5, 0, 1)))
+            ->set(6, cBounds(new cBoundingBox(0, 1, 0, 0.125 * 6, 0, 1)))
+            ->set(7, cBounds(new cBoundingBox(0, 1, 0, 0.125 * 7, 0, 1)))
+            ->set(8, cBounds(new cBoundingBox(0, 1, 0, 0.125 * 8, 0, 1)));
+
+    LOG("1");
+    std::list<BLOCKTYPE> stairTypes{
+            E_BLOCK_OAK_WOOD_STAIRS,
+            E_BLOCK_COBBLESTONE_STAIRS,
+            E_BLOCK_BRICK_STAIRS,
+            E_BLOCK_STONE_BRICK_STAIRS,
+            E_BLOCK_NETHER_BRICK_STAIRS,
+            E_BLOCK_SANDSTONE_STAIRS,
+            E_BLOCK_SPRUCE_WOOD_STAIRS,
+            E_BLOCK_BIRCH_WOOD_STAIRS,
+            E_BLOCK_JUNGLE_WOOD_STAIRS,
+            E_BLOCK_QUARTZ_STAIRS,
+            E_BLOCK_ACACIA_WOOD_STAIRS,
+            E_BLOCK_DARK_OAK_WOOD_STAIRS,
+            E_BLOCK_RED_SANDSTONE_STAIRS,
+            E_BLOCK_PURPUR_STAIRS
+    };
+    LOG("2");
+    for (BLOCKTYPE type : stairTypes)   {
+        LOG("3");
+        Info[type].boundingBoxes
+                .set(0, cBounds({
+                                        new cBoundingBox(0, 1, 0, 0.5, 0, 1),
+                                        new cBoundingBox(0.5, 1, 0, 1, 0, 1)
+                                })); //east (positive x)
+        LOG("4");
+    }
+    LOG("5");
+
 	for (size_t i = 0; i < Info.size(); ++i)
 	{
 		Info[i].m_IsRainBlocker |= Info[i].m_IsSolid;
+		Info[i].boundingBoxes.recompute(i);
 	}
 }

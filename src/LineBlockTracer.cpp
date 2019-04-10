@@ -117,7 +117,9 @@ bool cLineBlockTracer::FirstSolidHitTrace(
 			// We hit a solid block, calculate the exact hit coords and abort trace:
 			m_HitBlockCoords.Set(a_BlockX, a_BlockY, a_BlockZ);
 			m_HitBlockFace = a_EntryFace;
-			cBoundingBox bb(a_BlockX, a_BlockX + 1, a_BlockY, a_BlockY + cBlockInfo::GetBlockHeight(a_BlockType), a_BlockZ, a_BlockZ + 1);  // Bounding box of the block hit
+            cBoundingBox bb(*cBlockInfo::Get(a_BlockType).boundingBoxes.types[a_BlockMeta].bounds.back());
+            bb.Move(a_BlockX, a_BlockY, a_BlockZ);
+			//cBoundingBox bb(a_BlockX, a_BlockX + 1, a_BlockY, a_BlockY + cBlockInfo::GetBlockHeight(a_BlockType), a_BlockZ, a_BlockZ + 1);  // Bounding box of the block hit
 			double LineCoeff = 0;  // Used to calculate where along the line an intersection with the bounding box occurs
 			eBlockFace Face;  // Face hit
 			if (!bb.CalcLineIntersection(m_Start, m_End, LineCoeff, Face))
