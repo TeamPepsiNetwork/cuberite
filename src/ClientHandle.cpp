@@ -1333,7 +1333,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, *m_Player);
 			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, *m_Player);  // Strange bug with doors
 			SendPlayerPosition();  // Prevents the player from falling through the block that was temporarily broken client side.
-			m_Player->SendMessage("FastBreak?");  // TODO Anticheat hook
+			//m_Player->SendMessage("FastBreak?");  // TODO Anticheat hook
 			return;
 		}
 	}
