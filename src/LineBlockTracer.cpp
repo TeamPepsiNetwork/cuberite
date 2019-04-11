@@ -120,9 +120,11 @@ bool cLineBlockTracer::FirstSolidHitTrace(
 
             double LineCoeff = 0;
             eBlockFace Face;
-            //Vector3d & off(a_BlockX, a_BlockY, a_BlockZ);
+            Vector3d off(a_BlockX, a_BlockY, a_BlockZ);
             LOGD("Starting scan...");
-            for (cBoundingBox* bbRef : cBlockInfo::Get(a_BlockType).boundingBoxes.types[a_BlockMeta].bounds)  {
+            const cBounds* bounds = &cBlockInfo::Get(a_BlockType).boundingBoxes.types[a_BlockMeta];
+            //for (cBoundingBox* bbRef : cBlockInfo::Get(a_BlockType).boundingBoxes.types[a_BlockMeta].bounds)  {
+            for (size_t i = 0; i < bounds->count; i++)  {
                 //LOG("Offsetting min...");
                 //Vector3d min = bbRef->GetMin() + off;
                 //LOG("Offsetting max...");
@@ -135,12 +137,14 @@ bool cLineBlockTracer::FirstSolidHitTrace(
 				//so does this :/
 				//man c++ is wierd
 
-                LOGD("Dereferencing bounding box...");
+                /*LOGD("Dereferencing bounding box...");
 				cBoundingBox bb = *bbRef;
 				LOGD("minY=%f,maxY=%f", bb.GetMinY(), bb.GetMaxY());
                 LOGD("Offsetting bounding box...");
 				bb.Move(a_BlockX, a_BlockY, a_BlockZ);
-				//this works but is not so pretty :(
+				//this works but is not so pretty :(*/
+
+                cBoundingBox bb = bounds->bounds[i] + off;
 
                 LOGD("Checking for intersection...");
                 if (!bb.CalcLineIntersection(m_Start, m_End, LineCoeff, Face)) {

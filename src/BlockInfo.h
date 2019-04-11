@@ -2,7 +2,7 @@
 #pragma once
 
 
-
+#include "BoundingBox.h"
 
 
 // fwd:
@@ -12,36 +12,30 @@ class cBoundingBox;
 
 class cBounds	{
 public:
-	std::list<cBoundingBox*> bounds;
-	size_t count;
+	cBoundingBox bounds[8] = {
+			cBoundingBox(0, 0, 0, 0, 0, 0),
+			cBoundingBox(0, 0, 0, 0, 0, 0),
+			cBoundingBox(0, 0, 0, 0, 0, 0),
+			cBoundingBox(0, 0, 0, 0, 0, 0),
+			cBoundingBox(0, 0, 0, 0, 0, 0),
+			cBoundingBox(0, 0, 0, 0, 0, 0),
+			cBoundingBox(0, 0, 0, 0, 0, 0),
+			cBoundingBox(0, 0, 0, 0, 0, 0)
+	};
+	size_t count = 0;
 
-	cBounds():
-			bounds({}),
-			count(bounds.size())
-	{
-	}
+	cBounds() = default;
 
-    cBounds(const std::list<cBoundingBox*> & bounds):
-            bounds(bounds),
-            count(bounds.size())
-    {
-    }
+    cBounds(const std::vector<cBoundingBox> & bounds);
 
-    cBounds(cBoundingBox* bounds):
-            bounds({bounds}),
-            count(1)
-    {
-    }
+	cBounds(cBoundingBox bounds);
 };
 
 class cBlockBoundingBoxes	{
 public:
 	cBounds types[16];
 
-	cBlockBoundingBoxes():
-			types{cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds(), cBounds()}
-	{
-	}
+	cBlockBoundingBoxes() = default;
 
 	cBlockBoundingBoxes* set(size_t i, cBounds bounds);
 	cBlockBoundingBoxes* setAll(cBounds bounds);

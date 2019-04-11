@@ -9,10 +9,10 @@ local INSTANCE = {
     end,
     init = function()
         cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_USING_BLOCK, OnPlayerUsingBlock)
-        cPluginManager:AddHook(cPluginManager.HOOK_TAKE_DAMAGE, OnTakeDamage)
         cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_BREAKING_BLOCK, OnPlayerBreakingBlock)
         cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_PLACING_BLOCK, OnPlayerPlacingBlock)
-        cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity)
+        -- cPluginManager:AddHook(cPluginManager.HOOK_TAKE_DAMAGE, OnTakeDamage)
+        -- cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity)
     end,
     shutdown = function()
     end,
@@ -29,13 +29,21 @@ function OnPlayerBreakingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFa
 end
 
 function OnPlayerPlacingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta)
-    local prevented = false
+    if (a_BlockType == E_BLOCK_BED and a_BlockMeta >= 8) then
+        return false
+    end
+    local prevented = true
     local eyePos = a_Player:GetEyePosition()
     local endPos = eyePos + a_Player:GetLookVector() * maxReach
     cLineBlockTracer:Trace(a_Player:GetWorld(), {
+        OnNextBlock = function(ray_BlockX, ray_BlockY, ray_BlockZ, a_BlockType, a_BlockMeta)
+            if (ray_BlockX == a_BlockX and ray_BlockY == a_BlockY and ray_BlockZ == a_BlockZ) then
+                prevented = false
+                return true
+            end
+        end
     }, eyePos.x, eyePos.y, eyePos.z, endPos.x, endPos.y, endPos.z)
     return prevented
-    --LOG(VectorToString(a_Player:GetLookVector()))
 end
 
 function OnPlayerRightClickingEntity(a_Player, a_Entity)
@@ -52,7 +60,7 @@ function IsInLineOfSight(a_Player, pos, transparent)
     else
         hasHit, _, hitPos = cLineBlockTracer:FirstSolidHitTrace(a_Player:GetWorld(), eyes, eyes + a_Player:GetLookVector() * maxReach)
     end
-    LOG(hasHit and "Hit! " .. VectorToString(hitPos) or "Trace missed...")
+    -- LOG(hasHit and "Hit! " .. VectorToString(hitPos) or "Trace missed...")
     return hasHit and pos.x == hitPos.x and pos.y == hitPos.y and pos.z == hitPos.z
 end
 

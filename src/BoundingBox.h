@@ -99,6 +99,14 @@ public:
 	Vector3d GetMin(void) const { return m_Min; }
 	Vector3d GetMax(void) const { return m_Max; }
 
+	inline cBoundingBox operator + (const Vector3d& a_Rhs) const
+	{
+		return cBoundingBox(
+				this->m_Min + a_Rhs,
+				this->m_Max + a_Rhs
+		);
+	}
+
 	// tolua_end
 
 protected:
