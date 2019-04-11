@@ -117,7 +117,44 @@ bool cLineBlockTracer::FirstSolidHitTrace(
 			// We hit a solid block, calculate the exact hit coords and abort trace:
 			m_HitBlockCoords.Set(a_BlockX, a_BlockY, a_BlockZ);
 			m_HitBlockFace = a_EntryFace;
-            cBoundingBox bb(*cBlockInfo::Get(a_BlockType).boundingBoxes.types[a_BlockMeta].bounds.back());
+
+            double LineCoeff = 0;
+            eBlockFace Face;
+            //Vector3d & off(a_BlockX, a_BlockY, a_BlockZ);
+            LOGD("Starting scan...");
+            for (cBoundingBox* bbRef : cBlockInfo::Get(a_BlockType).boundingBoxes.types[a_BlockMeta].bounds)  {
+                //LOG("Offsetting min...");
+                //Vector3d min = bbRef->GetMin() + off;
+                //LOG("Offsetting max...");
+                //Vector3d max = bbRef->GetMax() + off;
+                //LOG("Creating bounds...");
+				//cBoundingBox bb(min, max);
+				//for some reason this segfaults...
+
+				//cBoundingBox bb(bbRef->GetMin() + off, bbRef->GetMax() + off);
+				//so does this :/
+				//man c++ is wierd
+
+                LOGD("Dereferencing bounding box...");
+				cBoundingBox bb = *bbRef;
+				LOGD("minY=%f,maxY=%f", bb.GetMinY(), bb.GetMaxY());
+                LOGD("Offsetting bounding box...");
+				bb.Move(a_BlockX, a_BlockY, a_BlockZ);
+				//this works but is not so pretty :(
+
+                LOGD("Checking for intersection...");
+                if (!bb.CalcLineIntersection(m_Start, m_End, LineCoeff, Face)) {
+                    LOGD("No intersection!");
+                    continue;
+                }
+                LOGD("We got a hit!");
+                m_HitCoords = m_Start + (m_End - m_Start) * LineCoeff;  // Point where projectile goes into the hit block
+                return true;
+            }
+            LOGD("Block didn't hit it at all.");
+            return false;
+
+            /*cBoundingBox bb(*cBlockInfo::Get(a_BlockType).boundingBoxes.types[a_BlockMeta].bounds.back());
             bb.Move(a_BlockX, a_BlockY, a_BlockZ);
 			//cBoundingBox bb(a_BlockX, a_BlockX + 1, a_BlockY, a_BlockY + cBlockInfo::GetBlockHeight(a_BlockType), a_BlockZ, a_BlockZ + 1);  // Bounding box of the block hit
 			double LineCoeff = 0;  // Used to calculate where along the line an intersection with the bounding box occurs
@@ -130,7 +167,7 @@ bool cLineBlockTracer::FirstSolidHitTrace(
                 return false;
 			}
 			m_HitCoords = m_Start + (m_End - m_Start) * LineCoeff;  // Point where projectile goes into the hit block
-			return true;
+			return true;*/
 		}
 
 	protected:

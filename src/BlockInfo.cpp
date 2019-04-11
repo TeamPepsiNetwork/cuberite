@@ -10,20 +10,20 @@ void cBlockInfo::sHandlerDeleter::operator () (cBlockHandler * a_Handler)
 	delete a_Handler;
 }
 
-
-void cBounds::recompute() {
-	//this->count = this->bounds.size();
-	throw "NYEF";
-}
-
-void cBlockBoundingBoxes::recompute(BLOCKTYPE m_BlockType) {
+void cBlockInfo::recomputeBounds() {
 	for (int i = 15; i >= 0; i--)	{
-        if (this->types[i].count == 0) {
-            this->types[i] = cBounds({
-                                             new cBoundingBox(0, 1, 0, 1, 0, 1)
-                                     });
-        }
-		this->types[i].count = this->types[i].bounds.size();
+		if (this->m_IsSolid && this->boundingBoxes.types[i].count == 0) {
+			if (this->m_FullyOccupiesVoxel) {
+				this->boundingBoxes.types[i] = cBounds({
+															   new cBoundingBox(0, 1, 0, 1, 0, 1)
+													   });
+			} else {
+				this->boundingBoxes.types[i] = cBounds({
+															   new cBoundingBox(0, 1, 0, this->m_BlockHeight, 0, 1)
+													   });
+			}
+		}
+		this->boundingBoxes.types[i].count = this->boundingBoxes.types[i].bounds.size();
 	}
 }
 
@@ -984,20 +984,8 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
 	Info[E_BLOCK_STRUCTURE_BLOCK              ].m_Hardness = -1.0f;
 
 	//bounding boxes
-    LOG("Bed");
-	Info[E_BLOCK_BED].boundingBoxes.setAll(cBounds(new cBoundingBox(0, 1, 0, 0.5625, 0, 1)));
-    LOG("Cake");
-	Info[E_BLOCK_CAKE].boundingBoxes
-            .set(0, cBounds(new cBoundingBox(0.0625, 0.9375, 0, 0.5, 0.0625, 0.9375)))
-            ->set(1, cBounds(new cBoundingBox(0.0625 * 3, 0.9375, 0, 0.5, 0.0625, 0.9375)))
-            ->set(2, cBounds(new cBoundingBox(0.0625 * 5, 0.9375, 0, 0.5, 0.0625, 0.9375)))
-            ->set(3, cBounds(new cBoundingBox(0.0625 * 7, 0.9375, 0, 0.5, 0.0625, 0.9375)))
-            ->set(4, cBounds(new cBoundingBox(0.0625 * 9, 0.9375, 0, 0.5, 0.0625, 0.9375)))
-            ->set(5, cBounds(new cBoundingBox(0.0625 * 11, 0.9375, 0, 0.5, 0.0625, 0.9375)))
-            ->set(6, cBounds(new cBoundingBox(0.0625 * 13, 0.9375, 0, 0.5, 0.0625, 0.9375)));
-    LOG("Enchantment table");
+	/*Info[E_BLOCK_BED].boundingBoxes.setAll(cBounds(new cBoundingBox(0, 1, 0, 0.5625, 0, 1)));
     Info[E_BLOCK_ENCHANTMENT_TABLE].boundingBoxes.setAll(cBounds(new cBoundingBox(0, 1, 0, 0.75, 0, 1)));
-    LOG("Slabs");
     Info[E_BLOCK_STONE_SLAB].boundingBoxes
             .setRange(0, 8, cBounds(new cBoundingBox(0, 1, 0, 0.5, 0, 1)))
             ->setRange(8, 16, cBounds(new cBoundingBox(0, 1, 0.5, 1, 0, 1)));
@@ -1009,8 +997,16 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
             ->setRange(8, 16, cBounds(new cBoundingBox(0, 1, 0.5, 1, 0, 1)));
     Info[E_BLOCK_RED_SANDSTONE_SLAB].boundingBoxes
             .setRange(0, 8, cBounds(new cBoundingBox(0, 1, 0, 0.5, 0, 1)))
-            ->setRange(8, 16, cBounds(new cBoundingBox(0, 1, 0.5, 1, 0, 1)));
-    LOG("Snow");
+            ->setRange(8, 16, cBounds(new cBoundingBox(0, 1, 0.5, 1, 0, 1)));*/
+    //redundant
+    Info[E_BLOCK_CAKE].boundingBoxes
+            .set(0, cBounds(new cBoundingBox(0.0625, 0.9375, 0, 0.5, 0.0625, 0.9375)))
+            ->set(1, cBounds(new cBoundingBox(0.0625 * 3, 0.9375, 0, 0.5, 0.0625, 0.9375)))
+            ->set(2, cBounds(new cBoundingBox(0.0625 * 5, 0.9375, 0, 0.5, 0.0625, 0.9375)))
+            ->set(3, cBounds(new cBoundingBox(0.0625 * 7, 0.9375, 0, 0.5, 0.0625, 0.9375)))
+            ->set(4, cBounds(new cBoundingBox(0.0625 * 9, 0.9375, 0, 0.5, 0.0625, 0.9375)))
+            ->set(5, cBounds(new cBoundingBox(0.0625 * 11, 0.9375, 0, 0.5, 0.0625, 0.9375)))
+            ->set(6, cBounds(new cBoundingBox(0.0625 * 13, 0.9375, 0, 0.5, 0.0625, 0.9375)));
     Info[E_BLOCK_SNOW].boundingBoxes
             .set(1, cBounds(new cBoundingBox(0, 1, 0, 0.125, 0, 1)))
             ->set(2, cBounds(new cBoundingBox(0, 1, 0, 0.125 * 2, 0, 1)))
@@ -1021,7 +1017,6 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
             ->set(7, cBounds(new cBoundingBox(0, 1, 0, 0.125 * 7, 0, 1)))
             ->set(8, cBounds(new cBoundingBox(0, 1, 0, 0.125 * 8, 0, 1)));
 
-    LOG("1");
     std::list<BLOCKTYPE> stairTypes{
             E_BLOCK_OAK_WOOD_STAIRS,
             E_BLOCK_COBBLESTONE_STAIRS,
@@ -1038,21 +1033,39 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
             E_BLOCK_RED_SANDSTONE_STAIRS,
             E_BLOCK_PURPUR_STAIRS
     };
-    LOG("2");
     for (BLOCKTYPE type : stairTypes)   {
-        LOG("3");
         Info[type].boundingBoxes
-                .set(0, cBounds({
-                                        new cBoundingBox(0, 1, 0, 0.5, 0, 1),
-                                        new cBoundingBox(0.5, 1, 0, 1, 0, 1)
-                                })); //east (positive x)
-        LOG("4");
-    }
-    LOG("5");
+				.set(0, cBounds({
+										new cBoundingBox(0, 1, 0, 0.5, 0, 1),
+										new cBoundingBox(0.5, 1, 0, 1, 0, 1)
+								})) //east (positive x)
+				->set(1, cBounds({
+										 new cBoundingBox(0, 1, 0, 0.5, 0, 1),
+										 new cBoundingBox(0, 0.5, 0, 1, 0, 1)
+								 })) //west (negative x)
+				->set(2, cBounds({
+										 new cBoundingBox(0, 1, 0, 0.5, 0, 1),
+										 new cBoundingBox(0, 1, 0, 1, 0.5, 1)
+								 })) //south (positive z)
+				->set(3, cBounds({
+										 new cBoundingBox(0, 1, 0, 0.5, 0, 1),
+										 new cBoundingBox(0, 1, 0, 1, 0, 0.5)
+								 })) //north (negative z)
+				;
+
+		//for upside-down stairs, we simply flip the bounding boxes along the y axis
+		for (size_t i = 0; i < 4; i++) {
+            cBoundingBox* start = Info[type].boundingBoxes.types[i].bounds.front();
+            Info[type].boundingBoxes.set(i | 0x4, cBounds({
+                                                                  new cBoundingBox(start[0].GetMinX(), start[0].GetMaxX(), 1.0 - start[0].GetMaxY(), 1.0 - start[0].GetMinY(), start[0].GetMinZ(), start[0].GetMaxZ()),
+                                                                  new cBoundingBox(start[1].GetMinX(), start[1].GetMaxX(), 1.0 - start[1].GetMaxY(), 1.0 - start[1].GetMinY(), start[1].GetMinZ(), start[1].GetMaxZ())
+                                                          }));
+		}
+	}
 
 	for (size_t i = 0; i < Info.size(); ++i)
 	{
 		Info[i].m_IsRainBlocker |= Info[i].m_IsSolid;
-		Info[i].boundingBoxes.recompute(i);
+		Info[i].recomputeBounds();
 	}
 }

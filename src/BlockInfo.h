@@ -15,8 +15,6 @@ public:
 	std::list<cBoundingBox*> bounds;
 	size_t count;
 
-	void recompute();
-
 	cBounds():
 			bounds({}),
 			count(bounds.size())
@@ -45,9 +43,7 @@ public:
 	{
 	}
 
-	void recompute(BLOCKTYPE m_BlockType);
 	cBlockBoundingBoxes* set(size_t i, cBounds bounds);
-	cBlockBoundingBoxes* setAll(size_t i, cBounds bounds);
 	cBlockBoundingBoxes* setAll(cBounds bounds);
 	cBlockBoundingBoxes* setRange(size_t min, size_t max, cBounds bounds);
 };
@@ -120,6 +116,8 @@ public:
 	cBlockBoundingBoxes boundingBoxes;
 
 private:
+    void recomputeBounds();
+
 	/** Storage for all the BlockInfo structures. */
 	class cBlockInfoArray;
 

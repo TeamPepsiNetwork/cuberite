@@ -29,6 +29,12 @@ function OnPlayerBreakingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFa
 end
 
 function OnPlayerPlacingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta)
+    local prevented = false
+    local eyePos = a_Player:GetEyePosition()
+    local endPos = eyePos + a_Player:GetLookVector() * maxReach
+    cLineBlockTracer:Trace(a_Player:GetWorld(), {
+    }, eyePos.x, eyePos.y, eyePos.z, endPos.x, endPos.y, endPos.z)
+    return prevented
     --LOG(VectorToString(a_Player:GetLookVector()))
 end
 
