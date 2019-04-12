@@ -48,6 +48,12 @@ public:
 
 	virtual ~cPlayer() override;
 
+	Vector3d m_LastPos[20];
+    double m_LastMaxSpeeds[20];
+    double avgMaxSpeed;
+
+    void resetLastPosAndSpeeds();
+
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;

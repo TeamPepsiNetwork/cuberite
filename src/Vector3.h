@@ -102,6 +102,16 @@ public:
 		return x * x + y * y + z * z;
 	}
 
+	inline double LengthXZ(void) const
+	{
+		return sqrt(static_cast<double>(x * x + z * z));
+	}
+
+	inline double SqrLengthXZ(void) const
+	{
+		return x * x + z * z;
+	}
+
 	inline T Dot(const Vector3<T> & a_Rhs) const
 	{
 		return x * a_Rhs.x + y * a_Rhs.y + z * a_Rhs.z;

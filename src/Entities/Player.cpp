@@ -358,8 +358,27 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		m_TicksUntilNextSave--;
 	}
+
+	for (int i = 18; i >= 0; i--)	{
+		this->m_LastPos[i + 1] = this->m_LastPos[i];
+		this->m_LastMaxSpeeds[i + 1] = this->m_LastMaxSpeeds[i];
+	}
+	this->m_LastPos[0] = this->GetPosition();
+	this->m_LastMaxSpeeds[0] = this->GetMaxSpeed();
+	double d = 0.0;
+	for (int i = 19; i >= 0; i--)	{
+		d += this->m_LastMaxSpeeds[i];
+	}
+	this->avgMaxSpeed = d / 20.0;
 }
 
+void cPlayer::resetLastPosAndSpeeds() {
+	for (int i = 19; i >= 0; i--)	{
+		this->m_LastPos[i] = this->GetPosition();
+		this->m_LastMaxSpeeds[i] = this->GetMaxSpeed();
+	}
+	this->avgMaxSpeed = this->GetMaxSpeed();
+}
 
 
 
@@ -1657,6 +1676,7 @@ void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 
 		m_World->BroadcastTeleportEntity(*this, GetClientHandle());
 		m_ClientHandle->SendPlayerMoveLook();
+		this->resetLastPosAndSpeeds();
 	}
 }
 
@@ -1690,6 +1710,7 @@ void cPlayer::Unfreeze()
 	m_IsFrozen = false;
 	BroadcastMovementUpdate(GetClientHandle());
 	GetClientHandle()->SendPlayerPosition();
+	this->resetLastPosAndSpeeds();
 }
 
 

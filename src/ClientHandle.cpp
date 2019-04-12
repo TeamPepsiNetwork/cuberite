@@ -842,9 +842,14 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 	auto PreviousIsOnGround = GetPlayer()->IsOnGround();
 
 	// If the player has moved too far, "repair" them:
-	if ((OldPosition - NewPosition).SqrLength() > 100 * 100)
+	double d = (43.178 * m_Player->avgMaxSpeed * 0.1 - 0.02141) * 1.1 * m_Player->GetWorld()->tickRate / 50.0;
+    for (int i = 9; i > 0; i--)    {
+        d -= (m_Player->m_LastPos[i] - m_Player->m_LastPos[i - 1]).LengthXZ();
+    }
+    LOGD("Max: %f, speed: %f", d, (m_Player->m_LastPos[0] - NewPosition).LengthXZ());
+	if (d - (m_Player->m_LastPos[0] - NewPosition).LengthXZ() < 0.0) // 100 * 100
 	{
-		LOGD("Too far away (%0.2f), \"repairing\" the client", (OldPosition - NewPosition).Length());
+		LOGD("Too far away (%0.2f), \"repairing\" the client", (OldPosition - NewPosition).LengthXZ());
 		SendPlayerMoveLook();
 		return;
 	}

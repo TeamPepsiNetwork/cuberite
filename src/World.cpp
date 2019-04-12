@@ -1034,6 +1034,24 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 
 	m_WorldAge += a_Dt;
 
+	//update tick rate stuff
+	{
+		for (int i = 8; i >= 0; i--)	{
+			this->lastTickTimes[i + 1] = this->lastTickTimes[i];
+		}
+		this->lastTickTimes[0] = a_Dt.count();
+		this->tickRate = (this->lastTickTimes[0]
+					 + this->lastTickTimes[1]
+					 + this->lastTickTimes[2]
+					 + this->lastTickTimes[3]
+					 + this->lastTickTimes[4]
+					 + this->lastTickTimes[5]
+					 + this->lastTickTimes[6]
+					 + this->lastTickTimes[7]
+					 + this->lastTickTimes[8]
+					 + this->lastTickTimes[9]) / 10.0;
+	}
+
 	if (m_IsDaylightCycleEnabled)
 	{
 		// We need sub-tick precision here, that's why we store the time in milliseconds and calculate ticks off of it

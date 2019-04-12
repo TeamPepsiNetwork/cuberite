@@ -863,6 +863,9 @@ public:
 	as at least one requests is active the chunk will be ticked). */
 	void SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked = true);  // tolua_export
 
+	long lastTickTimes[10] = { 50, 50, 50, 50, 50, 50, 50, 50, 50, 50 };
+	double tickRate = 50.0;
+
 private:
 
 	friend class cRoot;
