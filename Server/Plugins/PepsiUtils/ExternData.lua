@@ -7,6 +7,8 @@ function LoadExternData()
 end
 
 function LoadServers()
+    cPluginManager:BindCommand("/transfer", "pepsiutils.transfer", CommandTransfer, "")
+    cPluginManager:BindConsoleCommand("transfer", ConsoleCommandTransfer, "")
     cUrlClient:Get("https://gist.githubusercontent.com/DaMatrix/8b7ff92fcc7e49c0f511a8ed207d8e92/raw/teampepsi-server-list.json",
             function(a_Body, a_Data)
                 if (a_Body) then
@@ -79,4 +81,41 @@ function CommandChangeServer(a_Split, a_Player)
         BungeeTransferPlayer(a_Player, data.id, data.displayname)
     end
     return true
+end
+
+function CommandTransfer(a_Split, a_Player)
+    if (#a_Split ~= 3) then
+        if (a_Player == nil) then
+            LOGERROR("Usage: /transfer <player> <destination>")
+        else
+            a_Player:SendMessage("§cUsage: §l/transfer <player> <destination>")
+        end
+        return false
+    end
+    local data = SERVER_LIST[a_Split[3]]
+    if (data == nil) then
+        if (a_Player == nil) then
+            LOGERROR("Unknown server: " .. a_Split[3])
+        else
+            a_Player:SendMessage("§cUnknown server: " .. a_Split[3])
+        end
+        return false
+    elseif (not cRoot:Get():FindAndDoWithPlayer(a_Split[2], function(a_Player)
+        BungeeTransferPlayer(a_Player, data.id, data.displayname)
+    end)) then
+        if (a_Player == nil) then
+            LOGERROR("Unknown player: " .. a_Split[2])
+        else
+            a_Player:SendMessage("§cUnknown player: " .. a_Split[2])
+        end
+        return false
+    end
+    if (a_Player ~= nil) then
+        a_Player:SendMessage("§9Transferred §l" .. a_Split[2] .. "§r§9 to §l" .. a_Split[2] .. "§r§9!")
+    end
+    return true
+end
+
+function ConsoleCommandTransfer(a_Split)
+    return CommandTransfer(a_Split, nil)
 end

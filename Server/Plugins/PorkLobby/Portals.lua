@@ -18,7 +18,8 @@ function ConsiderTeleportPlayer(a_Player, a_NewPos)
     for id, bb in pairs(PORTALS) do
         if (bb:DoesIntersect(playerBB)) then
             --LOG("Sending player to " .. id .. "...")
-            BungeeTransferPlayer(a_Player, id)
+            cRoot:Get():QueueExecuteConsoleCommand("transfer " .. a_Player:GetName() .. " " .. id)
+            --BungeeTransferPlayer(a_Player, id)
             TeleportPlayerToSpawn(a_Player)
             return true
         end
