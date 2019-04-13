@@ -1224,7 +1224,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 	int MinY = std::max(FloorC(a_BlockY - ExplosionSizeInt), 0);
 	int MaxY = std::min(CeilC(a_BlockY + ExplosionSizeInt), cChunkDef::Height - 1);
 
-	if (ShouldDestroyBlocks)
+	if (m_World->DoExplosionsDamageBlocks() && ShouldDestroyBlocks)
 	{
 		cBlockArea area;
 		a_BlocksAffected.reserve(8 * static_cast<size_t>(ExplosionSizeInt * ExplosionSizeInt * ExplosionSizeInt));

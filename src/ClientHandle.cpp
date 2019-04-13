@@ -847,7 +847,7 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
         d -= (m_Player->m_LastPos[i] - m_Player->m_LastPos[i - 1]).LengthXZ();
     }
     LOGD("Max: %f, speed: %f", d, (m_Player->m_LastPos[0] - NewPosition).LengthXZ());
-	if (d - (m_Player->m_LastPos[0] - NewPosition).LengthXZ() < 0.0) // 100 * 100
+	if (d - (m_Player->m_LastPos[0] - NewPosition).LengthXZ() < 0.0 && !m_Player->HasPermission("anticheat.speed")) // 100 * 100
 	{
 		LOGD("Too far away (%0.2f), \"repairing\" the client", (OldPosition - NewPosition).LengthXZ());
 		SendPlayerMoveLook();

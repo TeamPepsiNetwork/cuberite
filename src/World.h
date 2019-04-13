@@ -854,7 +854,9 @@ public:
 	void TabCompleteUserName(const AString & a_Text, AStringVector & a_Results);
 
 	/** Get the current darkness level based on the time */
-	NIBBLETYPE GetSkyDarkness() { return m_SkyDarkness; }
+    NIBBLETYPE GetSkyDarkness() { return m_SkyDarkness; }
+
+    bool DoExplosionsDamageBlocks() { return explosionsDamageBlocks; }
 
 	/** Increments (a_AlwaysTicked == true) or decrements (false) the m_AlwaysTicked counter for the specified chunk.
 	If the m_AlwaysTicked counter is greater than zero, the chunk is ticked in the tick-thread regardless of
@@ -1146,4 +1148,5 @@ private:
 	Modifies the a_SetChunkData - moves the entities contained in it into the chunk. */
 	void SetChunkData(cSetChunkData & a_SetChunkData);
 
+	bool explosionsDamageBlocks;
 };  // tolua_export
