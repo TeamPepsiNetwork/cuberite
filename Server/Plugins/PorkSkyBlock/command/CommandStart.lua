@@ -31,6 +31,7 @@ function CommandStart(a_Split, a_Player)
         end)) then
             a_Player:SendMessage("§cUnable to find player with name: §l" .. a_Split[3])
         end
+        return true
     end
     if (data.startTime + START_COOLDOWN > age) then
         a_Player:SendMessage("§cYou can't do that for " .. GetCooldownString(a_Player))
