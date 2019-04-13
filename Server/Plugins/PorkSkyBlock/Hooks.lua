@@ -41,7 +41,11 @@ function OnPlayerSpawn(a_Player)
                     a_Player:TeleportToCoords(SPAWN_X + 0.5, SPAWN_Y, SPAWN_Z + 0.5)
                 end
             else
-                a_Player:TeleportToCoords(SPAWN_X + 0.5, SPAWN_Y, SPAWN_Z + 0.5)
+                local data = GetPlayerdata(a_Player)
+                if (data.island == nil) then
+                    a_Player:TeleportToCoords(SPAWN_X + 0.5, SPAWN_Y + 0.5, SPAWN_Z + 0.5)
+                else
+                end
                 -- TODO: respawn player on their island if they have one
             end
         end
@@ -86,8 +90,12 @@ function OnWorldTick(a_World, a_TimeDelta)
     end
 end
 
-function OnPlayerPlacingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta)
-    if (ANARCHY and SPAWN_REBUILD and a_BlockX <= 3 and a_BlockX >= -3 and a_BlockY <= 130 and a_BlockY >= 128 and a_BlockZ <= 3 and a_BlockZ >= -3 and not a_Player:HasPermission("skyblock.buildspawn")) then
-        return false
+function OnPlayerBreakingOrPlacingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta)
+    if (ANARCHY) then
+        if (SPAWN_REBUILD and a_BlockX <= 3 and a_BlockX >= -3 and a_BlockY <= 130 and a_BlockY >= 128 and a_BlockZ <= 3 and a_BlockZ >= -3 and not a_Player:HasPermission("skyblock.buildspawn")) then
+            return true
+        end
+    elseif (not DoesPlayerHavePermission(a_Player, a_BlockX, a_BlockZ)) then
+        return true
     end
 end

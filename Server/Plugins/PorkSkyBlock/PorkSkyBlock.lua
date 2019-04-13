@@ -75,6 +75,9 @@ function Initialize(Plugin)
     cPluginManager:AddHook(cPluginManager.HOOK_ENTITY_CHANGING_WORLD, OnEntityChangingWorld)
     cPluginManager:AddHook(cPluginManager.HOOK_WORLD_TICK, OnWorldTick)
 
+    cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_BREAKING_BLOCK, OnPlayerBreakingOrPlacingBlock)
+    cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_PLACING_BLOCK, OnPlayerBreakingOrPlacingBlock)
+
     -- Command Bindings
     cPluginManager:BindCommand("/challenge", "core.help", CommandChallenge, "§6- View " .. INSTANCE_NAME .. " challenges")
     cPluginManager:BindCommand("/start", "core.help", CommandStart, "§6- Get starter items for " .. INSTANCE_NAME)

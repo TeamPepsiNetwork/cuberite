@@ -22,6 +22,16 @@ end
 function CommandStart(a_Split, a_Player)
     local data = GetPlayerdata(a_Player)
     local age = WORLD:GetWorldAge()
+    if (#a_Split == 3 and a_Split[2] == "reset" and a_Player:HasPermission("skyblock.resetstart")) then
+        if (not cRoot:Get():FindAndDoWithPlayer(a_Split[3], function(otherPlayer)
+            local otherData = GetPlayerdata(otherPlayer)
+            otherData.startTime = 0
+            otherPlayer:SendMessage("§9Your start cooldown was reset!")
+            a_Player:SendMessage("§9Reset start cooldown for §l" .. otherPlayer:GetName() .. "§r§9!")
+        end)) then
+            a_Player:SendMessage("§cUnable to find player with name: §l" .. a_Split[3])
+        end
+    end
     if (data.startTime + START_COOLDOWN > age) then
         a_Player:SendMessage("§cYou can't do that for " .. GetCooldownString(a_Player))
     elseif (#a_Split ~= 2 or a_Split[2] ~= "confirm") then
