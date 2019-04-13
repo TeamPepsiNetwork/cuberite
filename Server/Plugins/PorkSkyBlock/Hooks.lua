@@ -29,6 +29,13 @@ function OnPlayerSpawn(a_Player)
         return
     end
 
+    if (PLAYER_DATA[a_Player:GetUUID()] == nil) then
+        LoadPlayerdata(a_Player)
+        a_Player:SendMessage("§9Welcome to §l" .. INSTANCE_NAME .. "§r§9!")
+        a_Player:SendMessage("§9Type §o/start§r§9 to obtain starter items.")
+        a_Player:SendMessage("§9Type §o/challenge§r§9 to view the challenge list.")
+    end
+
     if (a_Player:GetPosX() == 0 and a_Player:GetPosY() == 0 and a_Player:GetPosZ() == 0) then
         -- player is respawning
         local a_BedPos = a_Player:GetLastBedPos()
@@ -50,13 +57,6 @@ function OnPlayerSpawn(a_Player)
             end
         end
     end
-end
-
-function OnPlayerJoined(a_Player)
-    LoadPlayerdata(a_Player)
-    a_Player:SendMessage("§9Welcome to §l" .. INSTANCE_NAME .. "§r§9!")
-    a_Player:SendMessage("§9Type §o/start§r§9 to obtain starter items.")
-    a_Player:SendMessage("§9Type §o/challenge§r§9 to view the challenge list.")
 end
 
 function OnPlayerDestroyed(a_Player)
