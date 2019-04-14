@@ -31,9 +31,9 @@ function OnPlayerSpawn(a_Player)
 
     if (PLAYER_DATA[a_Player:GetUUID()] == nil) then
         LoadPlayerdata(a_Player)
-        a_Player:SendMessage("§9Welcome to §l" .. INSTANCE_NAME .. "§r§9!")
-        a_Player:SendMessage("§9Type §o/start§r§9 to obtain starter items.")
-        a_Player:SendMessage("§9Type §o/challenge§r§9 to view the challenge list.")
+        a_Player:SendMessage("§aWelcome to §l" .. INSTANCE_NAME .. "§r§a!")
+        a_Player:SendMessage("§aType §o/start§r§9 to obtain starter items.")
+        a_Player:SendMessage("§aType §o/challenge§r§9 to view the challenge list.")
     end
 
     if (a_Player:GetPosX() == 0 and a_Player:GetPosY() == 0 and a_Player:GetPosZ() == 0) then
