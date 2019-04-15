@@ -21,11 +21,13 @@ function LoadPlayerdata(a_Player)
     return data
 end
 
-function SavePlayerdata(a_Player)
+function SavePlayerdata(a_Player, unload)
     local uuid = a_Player:GetUUID()
     local data = PLAYER_DATA[uuid]
-    PLAYER_DATA[uuid] = nil
     assert(data ~= nil)
+    if (unload == nil or unload) then
+        PLAYER_DATA[uuid] = nil
+    end
     local json = cJson:Serialize(data)
     TryExec("REPLACE INTO skyblock VALUES('" .. uuid .. "', '" .. json .. "')")
     if (not ANARCHY and data.island ~= nil) then

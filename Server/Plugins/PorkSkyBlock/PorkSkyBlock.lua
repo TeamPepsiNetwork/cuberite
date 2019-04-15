@@ -18,6 +18,7 @@ WORLD_NAME = nil      -- name of the default world
 NETHER_NAME = nil     -- name of the nether world
 SPAWN_RADIUS = -1     -- random spawn radius
 INSTANCE_NAME = ""    -- name of this server
+SAVE_INTERVAL = ""    -- rate at which player data will be saved
 
 WORLD = nil           -- default world instance
 NETHER = nil          -- nether world instance
@@ -81,6 +82,23 @@ function Initialize(Plugin)
     cPluginManager:BindCommand("/challenge", "core.help", CommandChallenge, "§6- View " .. INSTANCE_NAME .. " challenges")
     cPluginManager:BindCommand("/start", "core.help", CommandStart, "§6- Get starter items for " .. INSTANCE_NAME)
 
+    -- Auto-save player data (just in case)
+    local autoSaveIsRecursive = nil
+    local autoSave = function(world)
+        world:ScheduleTask(SAVE_INTERVAL, autoSaveIsRecursive)
+        local didAny = false
+        world:ForEachPlayer(function(a_Player)
+            SavePlayerdata(a_Player, false)
+            didAny = true
+        end)
+        if (didAny) then
+            LOG("Saved player data!")
+        end
+    end
+    autoSaveIsRecursive = autoSave
+    autoSave(WORLD)
+    autoSave(NETHER)
+
     LOG(NAME .. " " .. VERSION .. " loaded successfully!")
 
     math.randomseed(os.time())
@@ -115,6 +133,7 @@ function LoadConfiguration()
     configIni:AddKeyComment("General", " \"Anarchy_mode\" toggles whether or not this is normal SkyBlock or anarchy SkyBlock")
     configIni:AddKeyComment("General", " \"Name\" is the name of this server instance")
     configIni:AddKeyComment("General", " \"Start_cooldown\" number of ticks between a player being allowed to start (i.e. obtain their starter items)")
+    configIni:AddKeyComment("General", " \"Save_interval\" number of ticks between automatic playerdata saves")
     configIni:AddKeyComment("Anarchy", " \"Spawn_radius\" is the radius (in chunks) of the spawn area")
     configIni:AddKeyComment("Anarchy", " \"Rebuild_spawn\" controls whether or not to constantly place blocks in the spawn area to prevent all blocks in the world from being destroyed")
     configIni:AddKeyComment("Spawn", " \"SpawnX\" is the X coordinate of the default spawn point")
@@ -128,6 +147,7 @@ function LoadConfiguration()
     WORLD_NAME = configIni:GetValueSet("Worlds", "World_name", ANARCHY and "anarchyskyblock" or "skyblock")
     NETHER_NAME = configIni:GetValueSet("Worlds", "Nether_name", ANARCHY and "anarchyskyblock_nether" or "skyblock_nether")
     START_COOLDOWN = configIni:GetValueSetI("General", "Start_cooldown", 1728000) -- default 1 day
+    SAVE_INTERVAL = configIni:GetValueSetI("General", "Save_interval", 6000) -- default 5 minutes
     SPAWN_RADIUS = configIni:GetValueSetI("Anarchy", "Spawn_radius", 8)
     SPAWN_REBUILD = configIni:GetValueSetB("Anarchy", "Rebuild_spawn", true)
     SPAWN_X = configIni:GetValueSetI("Spawn", "SpawnX", 0)
