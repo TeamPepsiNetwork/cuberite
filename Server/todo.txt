@@ -1,0 +1,4 @@
+- skins show up wrong
+- statistics (blocks and such)
+- mobs are SUPER buggy on and around slabs
+- killer is wrong when shot by bow

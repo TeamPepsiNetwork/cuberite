@@ -33,6 +33,7 @@ function Initialize(Plugin)
     cPluginManager:AddHook(cPluginManager.HOOK_EXPLODED, OnExploded)
     cPluginManager:AddHook(cPluginManager.HOOK_TAKE_DAMAGE, OnTakeDamage)
     cPluginManager:AddHook(cPluginManager.HOOK_KILLED, OnKilled)
+    cPluginManager:AddHook(cPluginManager.HOOK_WORLD_TICK, OnWorldTick)
 
     LOG(NAME .. " " .. VERSION .. " loaded successfully!")
     return true

@@ -10,3 +10,11 @@ function OnPlayerJoined(a_Player)
     end
     --a_Player:SendMessage(GetDisplayName(a_Player))
 end
+
+function OnWorldTick(a_World, a_TimeDelta)
+    a_World:ForEachPlayer(function(a_Player)
+        if (a_Player:HasPermission("pepsiutils.nohunger")) then
+            a_Player:Feed(40, 40)
+        end
+    end)
+end
