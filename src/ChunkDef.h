@@ -573,8 +573,42 @@ public:
 	}
 } ;
 
+
+
+/** Generic template that can store any kind of data together with a triplet of 3 coords */
+template <typename X, typename Y> class cCoordWithBiData
+{
+public:
+	int x;
+	int y;
+	int z;
+	X   Data;
+	Y other;
+
+	cCoordWithBiData(int a_X, int a_Y, int a_Z) :
+			x(a_X), y(a_Y), z(a_Z), Data(), other()
+	{
+	}
+
+	cCoordWithBiData(int a_X, int a_Y, int a_Z, const X & a_Data) :
+			x(a_X), y(a_Y), z(a_Z), Data(a_Data), other()
+	{
+	}
+
+	cCoordWithBiData(int a_X, int a_Y, int a_Z, const X & a_Data, const Y & a_other) :
+			x(a_X), y(a_Y), z(a_Z), Data(a_Data), other(a_other)
+	{
+	}
+} ;
+
 typedef cCoordWithData<int>        cCoordWithInt;
 typedef cCoordWithData<BLOCKTYPE>  cCoordWithBlock;
 
 typedef std::list<cCoordWithInt>   cCoordWithIntList;
 typedef std::vector<cCoordWithInt> cCoordWithIntVector;
+
+typedef cCoordWithBiData<int, int>        cCoordWithBiInt;
+
+typedef std::list<cCoordWithBiInt>   cCoordWithBiIntList;
+typedef std::vector<cCoordWithBiInt> cCoordWithBiIntVector;
+

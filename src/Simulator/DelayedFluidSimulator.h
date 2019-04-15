@@ -31,14 +31,14 @@ public:
 		/** Array of block containers, each item stores blocks for one Z coord
 		Int param is the block index (for faster duplicate comparison in Add())
 		*/
-		cCoordWithIntVector m_Blocks[16];
+		cCoordWithBiIntVector m_Blocks[16];
 	} ;
 
 	cDelayedFluidSimulatorChunkData(int a_TickDelay);
 	virtual ~cDelayedFluidSimulatorChunkData();
 
 	/** Slots, one for each delay tick, each containing the blocks to simulate */
-	cSlot * m_Slots;
+	cSlot m_Slot;
 } ;
 
 
@@ -62,8 +62,8 @@ public:
 protected:
 
 	int m_TickDelay;   // Count of the m_Slots array in each ChunkData
-	int m_AddSlotNum;  // Index into m_Slots[] where to add new blocks in each ChunkData
-	int m_SimSlotNum;  // Index into m_Slots[] where to simulate blocks in each ChunkData
+	//int m_AddSlotNum;  // Index into m_Slots[] where to add new blocks in each ChunkData
+	//int m_SimSlotNum;  // Index into m_Slots[] where to simulate blocks in each ChunkData
 
 	int m_TotalBlocks;  // Statistics only: the total number of blocks currently queued
 
