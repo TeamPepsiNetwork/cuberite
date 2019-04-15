@@ -692,7 +692,7 @@ void cPlayer::AddFoodExhaustion(double a_Exhaustion)
 {
 	if (!(IsGameModeCreative() || IsGameModeSpectator()))
 	{
-		m_FoodExhaustionLevel = std::min(m_FoodExhaustionLevel + a_Exhaustion, 40.0);
+		m_FoodExhaustionLevel = std::min(m_FoodExhaustionLevel + a_Exhaustion * 0.3333, 40.0);
 	}
 }
 
@@ -2610,7 +2610,7 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 		else if (IsOnGround())
 		{
 			m_Stats.AddValue(statDistWalked, Value);
-			AddFoodExhaustion((IsSprinting() ? 0.001 : 0.0001) * static_cast<double>(Value));
+			AddFoodExhaustion((IsSprinting() ? 0.001 : 0.00005) * static_cast<double>(Value));
 		}
 		else
 		{
