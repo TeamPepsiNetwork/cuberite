@@ -1,6 +1,7 @@
 
 #pragma once
 #include "Path.h"
+#include "../BoundingBox.h"
 
 #define WAYPOINT_RADIUS 0.5
 
@@ -45,6 +46,8 @@ private:
 
 	/** The height of the Mob which owns this PathFinder. */
 	double m_Height;
+
+	cBoundingBox m_Bounds;
 
 	/** The current cPath instance we have. This is discarded and recreated when a path recalculation is needed. */
 	std::unique_ptr<cPath> m_Path;

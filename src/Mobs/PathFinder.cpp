@@ -1,15 +1,14 @@
 #include "Globals.h"
 #include "PathFinder.h"
 #include "../Chunk.h"
-
-
-
+#include "../Vector3.h"
 
 
 cPathFinder::cPathFinder(double a_MobWidth, double a_MobHeight) :
 	m_Path(),
 	m_GiveUpCounter(0),
-	m_NotFoundCooldown(0)
+	m_NotFoundCooldown(0),
+	m_Bounds(cBoundingBox(Vector3d(0, 0, 0), a_MobWidth * 0.5, a_MobHeight))
 {
 	m_Width = a_MobWidth;
 	m_Height = a_MobHeight;
@@ -194,7 +193,6 @@ bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 	if (YBelowUs < 0)
 	{
 		return false;
-
 	}
 	Chunk->GetBlockTypeMeta(RelX, YBelowUs, RelZ, BlockType, BlockMeta);
 	if (!(IsWaterOrSolid(BlockType)))
