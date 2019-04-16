@@ -399,12 +399,13 @@ void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a
 		Vector3d HitPos = Pos + (NextPos - Pos) * EntityCollisionCallback.GetMinCoeff();
 
 		// DEBUG:
-		FLOGD("Projectile {0} has hit an entity {1} ({2}) at {3:.02f} (coeff {4:.03f})",
+		FLOGD("Projectile {0} has hit an entity {1} ({2}) at {3:.02f} (coeff {4:.03f}) (speed {5:.05f})",
 			m_UniqueID,
 			EntityCollisionCallback.GetHitEntity()->GetUniqueID(),
 			EntityCollisionCallback.GetHitEntity()->GetClass(),
 			HitPos,
-			EntityCollisionCallback.GetMinCoeff()
+			EntityCollisionCallback.GetMinCoeff(),
+			DeltaSpeed.Length()
 		);
 
 		OnHitEntity(*(EntityCollisionCallback.GetHitEntity()), HitPos);
@@ -426,6 +427,7 @@ void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a
 
 	// Update the position:
 	SetPosition(NextPos);
+	//TeleportToCoords(NextPos.x, NextPos.y, NextPos.z);
 
 	// Add slowdown and gravity effect to the speed:
 	Vector3d NewSpeed(GetSpeed());

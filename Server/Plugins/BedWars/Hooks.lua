@@ -34,15 +34,19 @@ function ResetPlayer(a_Player)
 
     -- default items
     inv:SetHotbarSlot(0, cItem(E_ITEM_DIAMOND_SWORD, 1, 0, "sharpness=5;fireaspect=2;unbreaking=3;knockback=3"))
-    inv:SetHotbarSlot(1, cItem(E_ITEM_BOW, 1, 0, "power=5;flame=1;unbreaking=3;knockback=3"))
+    inv:SetHotbarSlot(1, cItem(E_ITEM_BOW, 1, 0, "punch=5;flame=1;unbreaking=3;knockback=3"))
     inv:SetHotbarSlot(2, cItem(E_ITEM_DIAMOND_PICKAXE, 1, 0, "efficiency=7;unbreaking=3"))
     inv:SetHotbarSlot(3, cItem(E_BLOCK_OBSIDIAN, 64, 0))
     inv:SetHotbarSlot(8, cItem(E_ITEM_GOLDEN_APPLE, 64, E_META_GOLDEN_APPLE_ENCHANTED))
     inv:SetInventorySlot(8, cItem(E_ITEM_ARROW, 64))
-    inv:SetArmorSlot(0, cItem(E_ITEM_DIAMOND_HELMET, 1, 0, "unbreaking=3;blastprotection=4"))
-    inv:SetArmorSlot(1, cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "unbreaking=3;blastprotection=4"))
-    inv:SetArmorSlot(2, cItem(E_ITEM_DIAMOND_LEGGINGS, 1, 0, "unbreaking=3;blastprotection=4"))
-    inv:SetArmorSlot(3, cItem(E_ITEM_DIAMOND_BOOTS, 1, 0, "unbreaking=3;blastprotection=4;featherfalling=4"))
+    --inv:SetArmorSlot(0, cItem(E_ITEM_DIAMOND_HELMET, 1, 0, "unbreaking=3;blastprotection=4"))
+    --inv:SetArmorSlot(1, cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "unbreaking=3;blastprotection=4"))
+    --inv:SetArmorSlot(2, cItem(E_ITEM_DIAMOND_LEGGINGS, 1, 0, "unbreaking=3;blastprotection=4"))
+    --inv:SetArmorSlot(3, cItem(E_ITEM_DIAMOND_BOOTS, 1, 0, "unbreaking=3;blastprotection=4;featherfalling=4"))
+    inv:SetArmorSlot(0, cItem(E_ITEM_DIAMOND_HELMET, 1, 0, "unbreaking=3"))
+    inv:SetArmorSlot(1, cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "unbreaking=3"))
+    inv:SetArmorSlot(2, cItem(E_ITEM_DIAMOND_LEGGINGS, 1, 0, "unbreaking=3"))
+    inv:SetArmorSlot(3, cItem(E_ITEM_DIAMOND_BOOTS, 1, 0, "unbreaking=3;featherfalling=4"))
     local colors = {
         E_META_WOOL_WHITE,
         E_META_WOOL_LIGHTBLUE,

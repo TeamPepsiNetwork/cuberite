@@ -30,9 +30,12 @@ end
 function OnTakeDamage(a_Victim, a_Info)
     --local old = a_Info.FinalDamage
     a_Info.FinalDamage = CalculateMaxDealableDamage(a_Victim, a_Info.FinalDamage)
-    if (DoBedsExplode(a_Victim:GetWorld()) and a_Info.DamageType == dtExplosion and a_Info.Attacker == nil and CURRENT_KILL_PLAYER ~= nil) then
+    if (a_Info.DamageType == dtExplosion and DoBedsExplode(a_Victim:GetWorld()) and a_Info.Attacker == nil and CURRENT_KILL_PLAYER ~= nil) then
         a_Info.Attacker = CURRENT_KILL_PLAYER
     end
+    --if (a_Info.DamageType == dtArrow) then
+    --    LOG("Took " .. a_Info.FinalDamage .. " damage from arrow")
+    --end
     --LOG("PepsiUtils: Took " .. a_Info.FinalDamage .. " damage from " .. DamageTypeToString(a_Info.DamageType) .. "! (old=" .. old .. ")")
 end
 
@@ -42,6 +45,9 @@ function OnKilled(a_Victim, a_Info, a_DeathMessage)
     if (DoBedsExplode(a_Victim:GetWorld()) and a_Info.DamageType == dtExplosion and a_Info.Attacker == nil and CURRENT_KILL_PLAYER ~= nil) then
         a_Info.Attacker = CURRENT_KILL_PLAYER
     end
+    --if (a_Info.DamageType == dtArrow) then
+    --    LOG("Took " .. a_Info.FinalDamage .. " damage from arrow")
+    --end
     --LOG("PepsiUtils: Killed with " .. a_Info.FinalDamage .. " damage from " .. DamageTypeToString(a_Info.DamageType) .. "! (old=" .. old .. ")")
 end
 

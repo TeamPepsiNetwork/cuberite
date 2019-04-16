@@ -47,7 +47,7 @@ function OnPlayerPlacingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockTyp
 end
 
 function OnTakeDamage(a_Receiver, a_TDI)
-    if (a_TDI.Attacker ~= nil and a_TDI.Attacker:IsPlayer()) then
+    if (a_TDI.Attacker ~= nil and a_TDI.Attacker:IsPlayer() and a_TDI.DamageType ~= dtArrow) then
         if (Distance(a_Receiver:GetPosition(), a_TDI.Attacker:GetEyePosition()) - 1 > maxReach) then
             return true
         end

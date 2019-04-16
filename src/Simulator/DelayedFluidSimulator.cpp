@@ -24,7 +24,7 @@ bool cDelayedFluidSimulatorChunkData::cSlot::Add(int a_RelX, int a_RelY, int a_R
 
 	cCoordWithBiIntVector & Blocks = m_Blocks[a_RelZ];
 	int Index = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
-	for (cCoordWithBiIntVector::const_iterator itr = Blocks.begin(), end = Blocks.end(); itr != end; ++itr)
+	for (cCoordWithBiIntVector::iterator itr = Blocks.begin(), end = Blocks.end(); itr != end; ++itr)
 	{
 		if (itr->Data == Index)
 		{
