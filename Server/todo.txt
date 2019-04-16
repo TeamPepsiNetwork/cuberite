@@ -1,4 +1,9 @@
-- skins show up wrong
+TODO:
+- lava still sometimes flows before water
+- skin layers are borked
+- killer is wrong when shot by bow
 - statistics (blocks and such)
 - mobs are SUPER buggy on and around slabs
-- killer is wrong when shot by bow
+
+DONE:
+- skins show up wrong
