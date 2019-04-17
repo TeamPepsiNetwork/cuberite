@@ -28,11 +28,8 @@ bool cDelayedFluidSimulatorChunkData::cSlot::Add(int a_RelX, int a_RelY, int a_R
 	{
 		if (itr->Data == Index)
 		{
-			if (false && itr->other >= 0) {
-				//reset cooldown because we need to
-				LOG("Resetting cooldown at (%d,%d,%d) from %d", a_RelX, a_RelY, a_RelZ, itr->other);
-				itr->other = -2147483648;
-			}
+			//reset cooldown because we need to
+			itr->other = -2147483648;
 			// Already present
 			return false;
 		}
@@ -41,22 +38,6 @@ bool cDelayedFluidSimulatorChunkData::cSlot::Add(int a_RelX, int a_RelY, int a_R
 	return true;
 }
 
-bool cDelayedFluidSimulatorChunkData::cSlot::Remove(int a_RelX, int a_RelY, int a_RelZ)	{
-	ASSERT(a_RelZ >= 0);
-	ASSERT(a_RelZ < static_cast<int>(ARRAYCOUNT(m_Blocks)));
-
-	cCoordWithBiIntVector & Blocks = m_Blocks[a_RelZ];
-	int Index = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
-	for (cCoordWithBiIntVector::iterator itr = Blocks.begin(), end = Blocks.end(); itr != end; ++itr)
-	{
-		if (itr->Data == Index)
-		{
-			Blocks.erase(itr);
-			return true;
-		}
-	}
-	return false;
-}
 
 
 
@@ -131,36 +112,6 @@ void cDelayedFluidSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
 	}
 
 	++m_TotalBlocks;
-}
-
-void cDelayedFluidSimulator::RemoveBlock(int RelX, int RelY, int RelZ, cChunk * a_Chunk)
-{
-	if ((RelY < 0) || (RelY >= cChunkDef::Height))
-	{
-		// Not inside the world (may happen when rclk with a full bucket - the client sends Y = -1)
-		return;
-	}
-
-	if ((a_Chunk == nullptr) || !a_Chunk->IsValid())
-	{
-		return;
-	}
-
-	BLOCKTYPE BlockType = a_Chunk->GetBlock(RelX, RelY, RelZ);
-	if (BlockType != m_FluidBlock)
-	{
-		return;
-	}
-
-	auto ChunkDataRaw = (m_FluidBlock == E_BLOCK_WATER) ? a_Chunk->GetWaterSimulatorData() : a_Chunk->GetLavaSimulatorData();
-	cDelayedFluidSimulatorChunkData * ChunkData = static_cast<cDelayedFluidSimulatorChunkData *>(ChunkDataRaw);
-	cDelayedFluidSimulatorChunkData::cSlot & Slot = ChunkData->m_Slot;
-
-	// Add, if not already present:
-	if (Slot.Remove(RelX, RelY, RelZ))
-	{
-		--m_TotalBlocks;
-	}
 }
 
 

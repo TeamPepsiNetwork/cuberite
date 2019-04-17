@@ -27,7 +27,6 @@ public:
 
 		/** Adds the specified block unless already present; returns true if added, false if the block was already present */
 		bool Add(int a_RelX, int a_RelY, int a_RelZ);
-		bool Remove(int a_RelX, int a_RelY, int a_RelZ);
 
 		/** Array of block containers, each item stores blocks for one Z coord
 		Int param is the block index (for faster duplicate comparison in Add())
@@ -59,8 +58,6 @@ public:
 	virtual void Simulate(float a_Dt) override;
 	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
 	virtual cFluidSimulatorData * CreateChunkData(void) override { return new cDelayedFluidSimulatorChunkData(m_TickDelay); }
-
-	void RemoveBlock(int RelX, int RelY, int RelZ, cChunk * a_Chunk);
 
 protected:
 

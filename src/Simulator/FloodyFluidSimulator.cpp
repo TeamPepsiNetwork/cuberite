@@ -9,6 +9,7 @@
 #include "FloodyFluidSimulator.h"
 #include "../World.h"
 #include "../Chunk.h"
+#include "../BlockArea.h"
 #include "../Blocks/BlockHandler.h"
 #include "../BlockInServerPluginInterface.h"
 #include "../Blocks/ChunkInterface.h"
@@ -67,7 +68,6 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 	// When in contact with water, lava should harden
 	if (HardenBlock(a_Chunk, a_RelX, a_RelY, a_RelZ, MyBlock, MyMeta))
 	{
-		LOG("Block was hardened!");
 		// Block was changed, bail out
 		return;
 	}
@@ -249,7 +249,6 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 	{
 		if (IsBlockWater(BlockType))
 		{
-			//dynamic_cast<cDelayedFluidSimulatorChunkData>(a_NearChunk->GetLavaSimulatorData())-
 			// Lava flowing into water, change to stone / cobblestone based on direction:
 			BLOCKTYPE NewBlock = (a_NewMeta == 8) ? E_BLOCK_STONE : E_BLOCK_COBBLESTONE;
 			FLUID_FLOG("  Lava flowing into water, turning water at rel {0} into {1}",
@@ -263,7 +262,6 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 				0.5f,
 				1.5f
 			);
-			LOG("Lava flowing into water!");
 			return;
 		}
 	}
@@ -284,7 +282,6 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 				0.5f,
 				1.5f
 			);
-			LOG("Water flowing into lava!");
 			return;
 		}
 	}
@@ -324,9 +321,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 	a_NearChunk->SetBlock(a_RelX, a_RelY, a_RelZ, m_FluidBlock, a_NewMeta);
 	m_World.GetSimulatorManager()->WakeUp({BlockX, a_RelY, BlockZ}, a_NearChunk);
 
-	if (HardenBlock(a_NearChunk, a_RelX, a_RelY, a_RelZ, m_FluidBlock, a_NewMeta))	{
-		LOG("Block was hardened!");
-	}
+	HardenBlock(a_NearChunk, a_RelX, a_RelY, a_RelZ, m_FluidBlock, a_NewMeta);
 }
 
 
@@ -377,40 +372,52 @@ bool cFloodyFluidSimulator::CheckNeighborsForSource(cChunk * a_Chunk, int a_RelX
 }
 
 
-bool cFloodyFluidSimulator::HardenBlock(cChunk *a_Chunk, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) {
+
+
+
+bool cFloodyFluidSimulator::HardenBlock(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
+{
 	// Only lava blocks can harden
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
-	static const Vector3i Coords[] = {
-			Vector3i(1, 0, 0),
-			Vector3i(-1, 0, 0),
-			Vector3i(0, 0, 1),
-			Vector3i(0, 0, -1),
-	};
-	if (!IsBlockLava(a_BlockType)) {
-		/*if (IsBlockWater(a_BlockType)) {
-			for (size_t i = 0; i < ARRAYCOUNT(Coords); i++) {
-				if (a_Chunk->UnboundedRelGetBlock(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z, BlockType, BlockMeta) && IsBlockLava(BlockType)) {
-					HardenBlock(a_Chunk->GetRelNeighborChunk(a_RelX + Coords[i].x, a_RelZ + Coords[i].z),
-								a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z, BlockType,
-								BlockMeta);
-				}
-			}
-		}*/
+	if (!IsBlockLava(a_BlockType))
+	{
 		return false;
 	}
 
-	for (size_t i = 0; i < ARRAYCOUNT(Coords); i++) {
-		if (a_Chunk->UnboundedRelGetBlock(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z, BlockType, BlockMeta) && IsBlockWater(BlockType)) {
-			if (a_Meta == 0) {
-				// Source lava block
-				a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_OBSIDIAN, 0);
-			}
-				// Ignore last lava level
-			else if (a_Meta <= 4) {
-				a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_COBBLESTONE, 0);
-				LOG("Set to cobblestone!");
-			}
+	bool ShouldHarden = false;
+
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
+	static const Vector3i Coords[] =
+	{
+		Vector3i( 1, 0,  0),
+		Vector3i(-1, 0,  0),
+		Vector3i( 0, 0,  1),
+		Vector3i( 0, 0, -1),
+	};
+	for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
+	{
+		if (!a_Chunk->UnboundedRelGetBlock(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z, BlockType, BlockMeta))
+		{
+			continue;
+		}
+		if (IsBlockWater(BlockType))
+		{
+			ShouldHarden = true;
+		}
+	}  // for i - Coords[]
+
+	if (ShouldHarden)
+	{
+		if (a_Meta == 0)
+		{
+			// Source lava block
+			a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_OBSIDIAN, 0);
+			return true;
+		}
+		// Ignore last lava level
+		else if (a_Meta <= 4)
+		{
+			a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_COBBLESTONE, 0);
 			return true;
 		}
 	}
