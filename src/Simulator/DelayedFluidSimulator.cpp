@@ -28,8 +28,6 @@ bool cDelayedFluidSimulatorChunkData::cSlot::Add(int a_RelX, int a_RelY, int a_R
 	{
 		if (itr->Data == Index)
 		{
-			//reset cooldown because we need to
-			itr->other = -2147483648;
 			// Already present
 			return false;
 		}
