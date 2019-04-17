@@ -1020,15 +1020,20 @@ cBlockInfo::cBlockInfoArray::cBlockInfoArray()
             ->set(4, cBounds(cBoundingBox(0.0625 * 9, 0.9375, 0, 0.5, 0.0625, 0.9375)))
             ->set(5, cBounds(cBoundingBox(0.0625 * 11, 0.9375, 0, 0.5, 0.0625, 0.9375)))
             ->set(6, cBounds(cBoundingBox(0.0625 * 13, 0.9375, 0, 0.5, 0.0625, 0.9375)));
-    Info[E_BLOCK_SNOW].boundingBoxes
-            .set(0, cBounds(cBoundingBox(0, 1, 0, 0.125, 0, 1)))
-            ->set(1, cBounds(cBoundingBox(0, 1, 0, 0.125 * 2, 0, 1)))
-            ->set(2, cBounds(cBoundingBox(0, 1, 0, 0.125 * 3, 0, 1)))
-            ->set(3, cBounds(cBoundingBox(0, 1, 0, 0.125 * 4, 0, 1)))
-            ->set(4, cBounds(cBoundingBox(0, 1, 0, 0.125 * 5, 0, 1)))
-            ->set(5, cBounds(cBoundingBox(0, 1, 0, 0.125 * 6, 0, 1)))
-            ->set(6, cBounds(cBoundingBox(0, 1, 0, 0.125 * 7, 0, 1)))
-            ->set(7, cBounds(cBoundingBox(0, 1, 0, 0.125 * 8, 0, 1)));
+	Info[E_BLOCK_SNOW].boundingBoxes
+			.set(0, cBounds(cBoundingBox(0, 1, 0, 0.125, 0, 1)))
+			->set(1, cBounds(cBoundingBox(0, 1, 0, 0.125 * 2, 0, 1)))
+			->set(2, cBounds(cBoundingBox(0, 1, 0, 0.125 * 3, 0, 1)))
+			->set(3, cBounds(cBoundingBox(0, 1, 0, 0.125 * 4, 0, 1)))
+			->set(4, cBounds(cBoundingBox(0, 1, 0, 0.125 * 5, 0, 1)))
+			->set(5, cBounds(cBoundingBox(0, 1, 0, 0.125 * 6, 0, 1)))
+			->set(6, cBounds(cBoundingBox(0, 1, 0, 0.125 * 7, 0, 1)))
+			->set(7, cBounds(cBoundingBox(0, 1, 0, 0.125 * 8, 0, 1)));
+	Info[E_BLOCK_LADDER].boundingBoxes
+			.set(2, cBounds(cBoundingBox(0, 1, 0, 1, 0.0625 * 0, 0.0625 * 1))) //     north (negative z)
+			->set(3, cBounds(cBoundingBox(0, 1, 0, 1, 0.0625 * 15, 0.0625 * 16))) //  south (positive z)
+			->set(4, cBounds(cBoundingBox(0.0625 * 0, 0.0625 * 1, 0, 1, 0, 1))) //    west (negative x)
+			->set(5, cBounds(cBoundingBox(0.0625 * 15, 0.0625 * 16, 0, 1, 0, 1))); // east (positive x)
 
     std::list<BLOCKTYPE> stairTypes{
             E_BLOCK_OAK_WOOD_STAIRS,

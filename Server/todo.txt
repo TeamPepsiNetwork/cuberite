@@ -1,9 +1,10 @@
 TODO:
 - lava still sometimes flows before water
+- players who join later don't show up (skyblock)
 - skin layers are borked
-- killer is wrong when shot by bow
 - statistics (blocks and such)
 - mobs are SUPER buggy on and around slabs
 
 DONE:
 - skins show up wrong
+- killer is wrong when shot by bow
