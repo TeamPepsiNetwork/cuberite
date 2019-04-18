@@ -798,6 +798,7 @@ void cEntity::KilledBy(TakeDamageInfo & a_TDI)
 	GetDrops(Drops, a_TDI.Attacker);
 	m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
 
+	m_World->BroadcastTeleportEntity(*this);
 	m_World->BroadcastEntityStatus(*this, esGenericDead);
 }
 

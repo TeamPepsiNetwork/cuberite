@@ -3,14 +3,8 @@
 
 #include "Pawn.h"
 #include "Player.h"
-#include "../World.h"
 #include "../Bindings/PluginManager.h"
-#include "../BoundingBox.h"
 #include "../Blocks/BlockHandler.h"
-#include "../EffectID.h"
-#include "../Mobs/Monster.h"
-
-
 
 
 cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height) :
@@ -290,8 +284,11 @@ void cPawn::HandleFalling(void)
 	they're on a snow layer (Y divisible by 0.125) - ditto with snow layer check
 	*/
 
-	static const auto HalfWidth = GetWidth() / 2;
-	static const auto EPS = 0.0001;
+	static const auto HalfWidth = GetWidth() * 0.5;
+	//static const auto VectorHalfWidth = Vector3d(HalfWidth, 0, HalfWidth);
+	static const auto VectorEPS = Vector3d(0, -0.0001, 0);
+	static const auto NegOffset = VectorEPS + Vector3d(-HalfWidth, 0, -HalfWidth);
+	static const auto PosOffset = Vector3d(HalfWidth, GetHeight(), HalfWidth);
 
 	/* Since swimming is decided in a tick and is asynchronous to this, we have to check for dampeners ourselves.
 	The behaviour as of 1.8.9 is the following:
@@ -315,7 +312,7 @@ void cPawn::HandleFalling(void)
 	bool IsFootOnSlimeBlock = false;
 
 	/* The "cross" we sample around to account for the player width/girth */
-	static const struct
+	/*static const struct
 	{
 		int x, z;
 	} CrossSampleCoords[] =
@@ -325,15 +322,12 @@ void cPawn::HandleFalling(void)
 		{ -1, 0 },
 		{ 0, 1 },
 		{ 0, -1 },
-	};
+	};*/
 
 	/* The blocks we're interested in relative to the player to account for larger than 1 blocks.
 	This can be extended to do additional checks in case there are blocks that are represented as one block
 	in memory but have a hitbox larger than 1 (like fences) */
-	static const struct
-	{
-		int x, y, z;
-	} BlockSampleOffsets[] =
+	static const Vector3i BlockSampleOffsets[] =
 	{
 		{ 0, 0, 0 },  // TODO: something went wrong here (offset 0?)
 		{ 0, -1, 0 },  // Potentially causes mis-detection (IsFootInWater) when player stands on block diagonal to water (i.e. on side of pool)
@@ -343,17 +337,17 @@ void cPawn::HandleFalling(void)
 	We take the player's pointlike position (sole of feet), and expand it into a crosslike shape.
 	If any of the five points hit a block, we consider the player to be "on" (or "in") the ground. */
 	bool OnGround = false;
-	for (size_t i = 0; i < ARRAYCOUNT(CrossSampleCoords); i++)
+	/*for (size_t i = 0; i < ARRAYCOUNT(CrossSampleCoords); i++)
 	{
-		/* We calculate from the player's position, one of the cross-offsets above, and we move it down slightly so it's beyond inaccuracy.
-		The added advantage of this method is that if the player is simply standing on the floor,
-		the point will move into the next block, and the floor() will retrieve that instead of air. */
+		// We calculate from the player's position, one of the cross-offsets above, and we move it down slightly so it's beyond inaccuracy.
+		// The added advantage of this method is that if the player is simply standing on the floor,
+		// the point will move into the next block, and the floor() will retrieve that instead of air.
 		Vector3d CrossTestPosition = GetPosition() + Vector3d(CrossSampleCoords[i].x * HalfWidth, -EPS, CrossSampleCoords[i].z * HalfWidth);
 
-		/* We go through the blocks that we consider "relevant" */
+		// We go through the blocks that we consider "relevant"
 		for (size_t j = 0; j < ARRAYCOUNT(BlockSampleOffsets); j++)
 		{
-			Vector3i BlockTestPosition = CrossTestPosition.Floor() + Vector3i(BlockSampleOffsets[j].x, BlockSampleOffsets[j].y, BlockSampleOffsets[j].z);
+			Vector3i BlockTestPosition = CrossTestPosition.Floor() + BlockSampleOffsets[j];
 
 			if (!cChunkDef::IsValidHeight(BlockTestPosition.y))
 			{
@@ -363,7 +357,7 @@ void cPawn::HandleFalling(void)
 			BLOCKTYPE Block = GetWorld()->GetBlock(BlockTestPosition);
 			NIBBLETYPE BlockMeta = GetWorld()->GetBlockMeta(BlockTestPosition);
 
-			/* we do the cross-shaped sampling to check for water / liquids, but only on our level because water blocks are never bigger than unit voxels */
+			// we do the cross-shaped sampling to check for water / liquids, but only on our level because water blocks are never bigger than unit voxels
 			if (j == 0)
 			{
 				IsFootInWater |= IsBlockWater(Block);
@@ -371,12 +365,57 @@ void cPawn::HandleFalling(void)
 				IsFootOnSlimeBlock |= (Block == E_BLOCK_SLIME_BLOCK);
 			}
 
-			/* If the block is solid, and the blockhandler confirms the block to be inside, we're officially on the ground. */
+			// If the block is solid, and the blockhandler confirms the block to be inside, we're officially on the ground.
 			if ((cBlockInfo::IsSolid(Block)) && (cBlockInfo::GetHandler(Block)->IsInsideBlock(CrossTestPosition - BlockTestPosition, Block, BlockMeta)))
 			{
 				OnGround = true;
 			}
 		}
+	}*/
+
+	{
+		Vector3i min = (GetPosition() + NegOffset).Floor();
+		Vector3i max = (GetPosition() + PosOffset).Floor();
+		BLOCKTYPE Block;
+		NIBBLETYPE BlockMeta;
+		for (int x = min.x; x <= max.x; x++) {
+			for (int z = min.z; z <= max.z; z++) {
+				Vector3i testPos = Vector3i(x, min.y, z);
+				int startY = min.y == floor(GetPosY()) ? min.y : min.y + 1;
+				for (int y = startY; y <= max.y; y++)	{
+					//check if we're partially inside a block at the current mob height, if so, don't check this column
+					//this (((patches))) a bug where mobs can walk a bit beyond the bounds of their current
+					if (!cChunkDef::IsValidHeight(y)) {
+						continue;
+					}
+					GetWorld()->GetBlockTypeMeta(x, y, z, Block, BlockMeta);
+					if ((cBlockInfo::IsSolid(Block)) && (y != startY || cBlockInfo::GetHandler(Block)->IsInsideBlock(GetPosition() - GetPosition().Floor(), Block, BlockMeta))) { //x and z are ignored
+						goto ZLOOP;
+					}
+				}
+				for (int i = ARRAYCOUNT(BlockSampleOffsets) - 1; i >= 0; i--) {
+					Vector3i pos = testPos + BlockSampleOffsets[i];
+					if (!cChunkDef::IsValidHeight(pos.y)) {
+						continue;
+					}
+					GetWorld()->GetBlockTypeMeta(pos.x, pos.y, pos.z, Block, BlockMeta);
+
+					if (i == 0) {
+						IsFootInWater |= IsBlockWater(Block);
+						IsFootInLiquid |= IsFootInWater || IsBlockLava(Block) || (Block == E_BLOCK_COBWEB);  // okay so cobweb is not _technically_ a liquid...
+						IsFootOnSlimeBlock |= (Block == E_BLOCK_SLIME_BLOCK);
+					}
+
+					if ((cBlockInfo::IsSolid(Block)) && (cBlockInfo::GetHandler(Block)->IsInsideBlock(GetPosition() + VectorEPS - pos, Block, BlockMeta))) { //x and z are ignored
+						OnGround = true;
+					}
+				}
+				ZLOOP:;
+			}
+		}
+		/*if (GetPosY() < 145 && ((GetPosition() - m_LastPosition).y > 0 || OnGround)) {
+			FLOG("on ground! pos={0}, min=${1}, max={2}, lastGroundHeight={3}", GetPosition(), min, max, m_LastGroundHeight);
+		}*/
 	}
 
 	/* So here's the use of the rules above: */
@@ -425,6 +464,7 @@ void cPawn::HandleFalling(void)
 		auto Damage = static_cast<int>(m_LastGroundHeight - GetPosY() - 3.0);
 		if ((Damage > 0) && !FallDamageAbsorbed)
 		{
+			//FLOG("Taking {0} damage", Damage);
 			TakeDamage(dtFalling, nullptr, Damage, Damage, 0);
 
 			// Fall particles

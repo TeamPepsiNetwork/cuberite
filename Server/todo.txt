@@ -3,13 +3,13 @@ TODO:
 - skin layers are borked
 - statistics (blocks and such)
 - mobs are SUPER buggy on and around slabs
-- fall damage is seemingly reset by falling along the edge of a block
 - attacking in freecam
 
 DONE:
 - skins show up wrong
 - killer is wrong when shot by bow
 - mobs are too smart: actively avoid falling down (turned out to be ai overriding water movement)
+- fall damage is seemingly reset by falling along the edge of a block
 
 meh:
 - lava still sometimes flows before water
