@@ -1035,6 +1035,20 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// Get water direction
 	Vector3f WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ);
 
+	Vector3f waterDir;
+	{
+		double halfWidth = GetWidth() * 0.5;
+		Vector3i min = (GetPosition() - Vector3d(halfWidth, 0, halfWidth)).Floor();
+		Vector3i max = (GetPosition() + Vector3d(halfWidth, GetHeight(), halfWidth)).Floor();
+		for (int x = min.x; x <= max.x; x++)	{
+			for (int y = min.y; y <= max.y; y++)	{
+				for (int z = min.z; z <= max.z; z++)	{
+					waterDir += m_World->GetWaterSimulator()->GetFlowingDirection(x, y, z);
+				}
+			}
+		}
+	}
+
 	m_WaterSpeed *= 0.9;  // Reduce speed each tick
 
 	auto AdjustSpeed = [](double & a_WaterSpeed, float a_WaterDir)
@@ -1049,6 +1063,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 		};
 	AdjustSpeed(m_WaterSpeed.x, WaterDir.x);
+	AdjustSpeed(m_WaterSpeed.y, WaterDir.y);
 	AdjustSpeed(m_WaterSpeed.z, WaterDir.z);
 
 	NextSpeed += m_WaterSpeed;

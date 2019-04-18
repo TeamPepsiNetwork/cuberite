@@ -47,6 +47,9 @@ public:
 
 	/** Returns a unit vector in the direction the fluid is flowing or a zero-vector if not flowing. */
 	virtual Vector3f GetFlowingDirection(int a_X, int a_Y, int a_Z);
+	inline Vector3f GetFlowingDirection(Vector3i pos)	{
+		return this->GetFlowingDirection(pos.x, pos.y, pos.z);
+	}
 
 	/** Creates a ChunkData object for the simulator to use. The simulator returns the correct object type. */
 	virtual cFluidSimulatorData * CreateChunkData(void) { return nullptr; }

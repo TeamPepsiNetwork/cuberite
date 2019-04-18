@@ -23,6 +23,7 @@
 #include "Blocks/WorldInterface.h"
 #include "Blocks/BroadcastInterface.h"
 #include "EffectID.h"
+#include "Simulator/FluidSimulator.h"
 
 
 

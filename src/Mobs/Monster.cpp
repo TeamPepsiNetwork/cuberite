@@ -184,6 +184,20 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 		return;
 	}
 
+	/*Vector3f waterDir;
+	{
+		double halfWidth = GetWidth() * 0.5;
+		Vector3i min = (GetPosition() - Vector3d(halfWidth, 0, halfWidth)).Floor();
+		Vector3i max = (GetPosition() + Vector3d(halfWidth, GetHeight(), halfWidth)).Floor();
+		for (int x = min.x; x <= max.x; x++)	{
+			for (int y = min.y; y <= max.y; y++)	{
+				for (int z = min.z; z <= max.z; z++)	{
+					waterDir += m_World->GetWaterSimulator()->GetFlowingDirection(x, y, z);
+				}
+			}
+		}
+	}*/
+
 	if (m_JumpCoolDown <= 0)
 	{
 		if (DoesPosYRequireJump(FloorC(m_NextWayPointPosition.y)))
@@ -195,10 +209,10 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 			{
 				m_bOnGround = false;
 				m_JumpCoolDown = 20;
-				AddPosY(1.6);  // Jump!!
-				SetSpeedY(1);
-				SetSpeedX(3.2 * (m_NextWayPointPosition.x - GetPosition().x));  // Move forward in a preset speed.
-				SetSpeedZ(3.2 * (m_NextWayPointPosition.z - GetPosition().z));  // The numbers were picked based on trial and error
+					AddPosY(1.6);  // Jump!!
+					AddSpeedY(1);
+					AddSpeedX(3.2 * (m_NextWayPointPosition.x - GetPosition().x));  // Move forward in a preset speed.
+					AddSpeedZ(3.2 * (m_NextWayPointPosition.z - GetPosition().z));  // The numbers were picked based on trial and error
 			}
 		}
 	}
@@ -215,11 +229,11 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 
 		if (m_bOnGround)
 		{
-			Distance *= 2.5f;
+			Distance *= IsInWater() ? 1.3f : 2.5f;
 		}
 		else if (IsInWater())
 		{
-			Distance *= 1.3f;
+				Distance *= 1.3f;
 		}
 		else
 		{
