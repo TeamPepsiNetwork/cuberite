@@ -2863,7 +2863,8 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 void cPlayer::SetSkinParts(int a_Parts)
 {
 	m_SkinParts = a_Parts & spMask;
-	m_World->BroadcastEntityMetadata(*this, m_ClientHandle.get());
+	//m_World->BroadcastEntityMetadata(*this, m_ClientHandle.get());
+	m_World->BroadcastEntityMetadata(*this);
 }
 
 
