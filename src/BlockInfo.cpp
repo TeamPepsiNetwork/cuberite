@@ -17,7 +17,7 @@ void cBlockInfo::recomputeBounds() {
 				this->boundingBoxes.types[i] = cBounds({
 															   cBoundingBox(0, 1, 0, 1, 0, 1)
 													   });
-			} else {
+			} else if (this->m_BlockType != E_BLOCK_AIR) {
 				this->boundingBoxes.types[i] = cBounds({
 															   cBoundingBox(0, 1, 0, this->m_BlockHeight, 0, 1)
 													   });

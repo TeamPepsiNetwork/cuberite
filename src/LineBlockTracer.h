@@ -119,6 +119,8 @@ protected:
 	bool MoveToNextBlock(void);
 
 	bool ChunkCallback(cChunk * a_Chunk);
+
+	bool checkForCollision(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace);
 } ;
 
 

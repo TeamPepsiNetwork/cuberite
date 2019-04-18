@@ -215,16 +215,26 @@ bool cLineBlockTracer::FirstOpaqueHitTrace(
 			// We hit an opaque block, calculate the exact hit coords and abort trace:
 			m_HitBlockCoords.Set(a_BlockX, a_BlockY, a_BlockZ);
 			m_HitBlockFace = a_EntryFace;
-			cBoundingBox bb(a_BlockX, a_BlockX + 1, a_BlockY, a_BlockY + 1, a_BlockZ, a_BlockZ + 1);  // Bounding box of the block hit
-			double LineCoeff = 0;  // Used to calculate where along the line an intersection with the bounding box occurs
-			eBlockFace Face;  // Face hit
-			if (!bb.CalcLineIntersection(m_Start, m_End, LineCoeff, Face))
-			{
-				// Math rounding errors have caused the calculation to miss the block completely, assume immediate hit
-				LineCoeff = 0;
+
+			double LineCoeff = 0;
+			eBlockFace Face;
+			Vector3d off(a_BlockX, a_BlockY, a_BlockZ);
+			LOGD("Starting scan...");
+			const cBounds* bounds = &cBlockInfo::Get(a_BlockType).boundingBoxes.types[a_BlockMeta];
+			for (size_t i = 0; i < bounds->count; i++)  {
+				cBoundingBox bb = bounds->bounds[i] + off;
+
+				LOGD("Checking for intersection...");
+				if (!bb.CalcLineIntersection(m_Start, m_End, LineCoeff, Face)) {
+					LOGD("No intersection!");
+					continue;
+				}
+				LOGD("We got a hit!");
+				m_HitCoords = m_Start + (m_End - m_Start) * LineCoeff;  // Point where projectile goes into the hit block
+				return true;
 			}
-			m_HitCoords = m_Start + (m_End - m_Start) * LineCoeff;  // Point where projectile goes into the hit block
-			return true;
+			LOGD("Block didn't hit it at all.");
+			return false;
 		}
 
 	protected:
@@ -402,7 +412,28 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 }
 
 
+bool cLineBlockTracer::checkForCollision(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace)	{
+	const cBounds* bounds = &cBlockInfo::Get(a_BlockType).boundingBoxes.types[a_BlockMeta];
+	if (bounds->count == 0)	{
+		return true;
+	}
+	double LineCoeff = 0;
+	eBlockFace Face;
+	Vector3d off(a_BlockX, a_BlockY, a_BlockZ);
+	LOGD("Starting scan...");
+	for (size_t i = 0; i < bounds->count; i++)  {
+		cBoundingBox bb = bounds->bounds[i] + off;
 
+		LOGD("Checking for intersection...");
+		if (bb.CalcLineIntersection(Vector3d(m_StartX, m_StartY, m_StartZ), Vector3d(m_EndX, m_EndY, m_EndZ), LineCoeff, Face)) {
+			LOGD("We got a hit!");
+			return true;
+		}
+		LOGD("No intersection!");
+	}
+	LOGD("Block didn't hit it at all.");
+	return false;
+}
 
 
 bool cLineBlockTracer::ChunkCallback(cChunk * a_Chunk)
@@ -456,7 +487,7 @@ bool cLineBlockTracer::ChunkCallback(cChunk * a_Chunk)
 			int RelX = m_CurrentX - a_Chunk->GetPosX() * cChunkDef::Width;
 			int RelZ = m_CurrentZ - a_Chunk->GetPosZ() * cChunkDef::Width;
 			a_Chunk->GetBlockTypeMeta(RelX, m_CurrentY, RelZ, BlockType, BlockMeta);
-			if (m_Callbacks->OnNextBlock(m_CurrentX, m_CurrentY, m_CurrentZ, BlockType, BlockMeta, m_CurrentFace))
+			if (checkForCollision(m_CurrentX, m_CurrentY, m_CurrentZ, BlockType, BlockMeta, m_CurrentFace) && m_Callbacks->OnNextBlock(m_CurrentX, m_CurrentY, m_CurrentZ, BlockType, BlockMeta, m_CurrentFace))
 			{
 				// The callback terminated the trace
 				return false;
