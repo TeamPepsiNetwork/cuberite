@@ -1,8 +1,6 @@
 TODO:
 - players who join later don't show up (skyblock)
 - statistics (blocks and such)
-- mobs are SUPER buggy on and around slabs
-- attacking in freecam
 
 DONE:
 - skins show up wrong
@@ -11,6 +9,7 @@ DONE:
 - fall damage is seemingly reset by falling along the edge of a block
 - buckets are buggy when standing on a slab
 - skin layers are borked
+- attacking in freecam
 
 meh:
 - lava still sometimes flows before water

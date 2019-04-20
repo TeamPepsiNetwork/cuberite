@@ -3,7 +3,9 @@ PLAYER_HISTORY = {}
 RESET_COUNTER = 0
 
 function OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc)
-    a_ChunkDesc:ReplaceRelCuboid(0, 16, 0, 256, 0, 16, E_BLOCK_AIR, 0, E_BLOCK_BARRIER, 0)
+    if (a_World == WORLD) then
+        a_ChunkDesc:ReplaceRelCuboid(0, 16, 0, 256, 0, 16, E_BLOCK_AIR, 0, E_BLOCK_BARRIER, 0)
+    end
 end
 
 function OnPlayerSpawned(a_Player)
@@ -18,7 +20,7 @@ end
 
 function ResetPlayer(a_Player)
     local world = a_Player:GetWorld()
-    if (world:GetName() == WORLD_NAME and not TeleportPlayerToRandomPosition(a_Player, a_Player:GetWorld(), 0, 0, ARENA_RADIUS, -1)) then
+    if (world == WORLD and not TeleportPlayerToRandomPosition(a_Player, a_Player:GetWorld(), 0, 0, ARENA_RADIUS, -1)) then
         a_Player:TeleportToCoords(0.5, 256, 0.5)
     end
     local inv = a_Player:GetInventory()
@@ -105,7 +107,6 @@ function DoResetArena(a_World)
         end)
         ARENA_BLOCKS:Write(a_World, -ARENA_RADIUS, 0, -ARENA_RADIUS)
         a_World:ForEachPlayer(ResetPlayer)
-        QUEUED_RIGHT_CLICKS = {}
     end)
 end
 
