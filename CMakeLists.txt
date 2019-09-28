@@ -13,10 +13,16 @@
 
 
 
-cmake_minimum_required (VERSION 2.8.7)
+cmake_minimum_required (VERSION 3.9)
 
 if (POLICY CMP0054)
 	cmake_policy(SET CMP0054 NEW)
+endif()
+
+if (POLICY CMP0069) # Interprocedural optimization
+	cmake_policy(SET CMP0069 NEW)
+else()
+	message(FATAL_ERROR "Interprocedural optimization not present!")
 endif()
 
 # Without this, the MSVC variable isn't defined for MSVC builds ( https://cmake.org/pipermail/cmake/2011-November/047130.html )
